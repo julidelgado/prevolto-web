@@ -9,13 +9,13 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
   },
@@ -26,6 +26,7 @@ html[lang="en"] .es { display: none !important; }
 html[lang="es"] .en { display: none !important; }
 html { scroll-behavior: smooth; }
 
+/* ---- Aurora ---- */
 @keyframes aurora-1 {
   0%, 100% { transform: translate(0, 0) scale(1); }
   25% { transform: translate(80px, -40px) scale(1.1); }
@@ -51,6 +52,7 @@ html { scroll-behavior: smooth; }
   background-size: 64px 64px;
 }
 
+/* ---- Animated gradient text ---- */
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -60,7 +62,37 @@ html { scroll-behavior: smooth; }
   animation: gradient-shift 5s ease infinite;
 }
 
-/* Step numbers — outlined style */
+/* ---- Hero staggered entrance ---- */
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.hero-stagger {
+  opacity: 0;
+  animation: heroIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ---- Scroll reveal ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- Chat mockup float ---- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.chat-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ---- Step numbers ---- */
 .step-num {
   -webkit-text-stroke: 2px #94a3b8;
   -webkit-text-fill-color: transparent;
@@ -82,7 +114,35 @@ html { scroll-behavior: smooth; }
   filter: drop-shadow(0 0 12px rgba(16,185,129,0.3));
 }
 
-/* Modal */
+/* ---- Case study border glow ---- */
+@keyframes borderPulse {
+  0%, 100% { border-color: rgba(59,130,246,0.15); }
+  50% { border-color: rgba(139,92,246,0.3); }
+}
+.border-glow {
+  animation: borderPulse 4s ease-in-out infinite;
+}
+
+/* ---- Button glow on hover ---- */
+.btn-glow {
+  position: relative;
+}
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  opacity: 0;
+  z-index: -1;
+  filter: blur(16px);
+  transition: opacity 0.4s ease;
+}
+.btn-glow:hover::after {
+  opacity: 0.5;
+}
+
+/* ---- Modal ---- */
 @keyframes modalIn {
   from { opacity: 0; transform: scale(0.95) translateY(10px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
@@ -92,7 +152,7 @@ html { scroll-behavior: smooth; }
   to { opacity: 1; }
 }
 
-/* Toast */
+/* ---- Toast ---- */
 @keyframes toastIn {
   from { transform: translate(-50%, 20px); opacity: 0; }
   to { transform: translate(-50%, 0); opacity: 1; }
@@ -102,10 +162,16 @@ html { scroll-behavior: smooth; }
   to { transform: translate(-50%, 20px); opacity: 0; }
 }
 
-/* Logo bolt glow on hover */
-.logo-bolt { transition: filter 0.3s ease; }
-.group:hover .logo-bolt {
-  filter: drop-shadow(0 0 8px rgba(96,165,250,0.6));
+/* ---- Stat reveal scale ---- */
+@keyframes statPop {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+.stat-pop {
+  opacity: 0;
+}
+.stat-pop.visible {
+  animation: statPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 </style>
 </head>
@@ -116,14 +182,7 @@ html { scroll-behavior: smooth; }
 <nav class="fixed top-0 w-full z-50 border-b border-white/[0.06]">
   <div class="absolute inset-0 bg-[#050a18]/70 backdrop-blur-2xl"></div>
   <div class="relative max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-    <a href="/" class="flex items-center group">
-      <span class="text-[22px] font-bold tracking-tight text-white">Pre</span>
-      <svg class="logo-bolt h-[18px] w-[14px] relative top-[1px] -mx-[1px]" viewBox="0 0 14 20" fill="none">
-        <polygon points="9,0 2,11 7,11 5,20 12,9 7,9" fill="url(#bolt-nav)"/>
-        <defs><linearGradient id="bolt-nav" x1="7" y1="0" x2="7" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#60A5FA"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
-      </svg>
-      <span class="text-[22px] font-bold tracking-tight text-white">olto</span>
-    </a>
+    <a href="/" class="text-lg font-bold tracking-tight text-white hover:opacity-80 transition-opacity">Prevolto</a>
 
     <div class="hidden md:flex items-center gap-8">
       <a href="#como-funciona" class="text-[13px] text-slate-400 hover:text-white transition-colors">
@@ -160,14 +219,14 @@ html { scroll-behavior: smooth; }
 
   <div class="relative max-w-6xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-20 lg:py-0">
     <div class="space-y-8">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08]">
+      <div class="hero-stagger inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08]" style="animation-delay:0s">
         <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
         <span class="text-[11px] font-semibold tracking-widest uppercase text-slate-400">
           <span class="es">Automatización con IA</span><span class="en">AI Automation</span>
         </span>
       </div>
 
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
+      <h1 class="hero-stagger text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight" style="animation-delay:0.15s">
         <span class="es">Tu negocio responde a clientes </span>
         <span class="en">Your business responds to clients </span>
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-violet-400 to-purple-400 animated-gradient">
@@ -175,15 +234,15 @@ html { scroll-behavior: smooth; }
         </span>
       </h1>
 
-      <p class="text-lg text-slate-400 leading-relaxed max-w-xl">
+      <p class="hero-stagger text-lg text-slate-400 leading-relaxed max-w-xl" style="animation-delay:0.3s">
         <span class="es">Chatbots inteligentes entrenados con el contenido de tu web. Responden preguntas, captan leads y atienden consultas — mientras tu equipo se enfoca en lo importante.</span>
         <span class="en">Smart chatbots trained on your website content. They answer questions, capture leads, and handle inquiries — while your team focuses on what matters.</span>
       </p>
 
-      <div class="flex flex-col sm:flex-row items-start gap-4 pt-2">
-        <button onclick="openForm()" class="group flex items-center gap-3 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 px-8 py-4 rounded-xl font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:shadow-blue-500/30 hover:scale-[1.02]">
+      <div class="hero-stagger flex flex-col sm:flex-row items-start gap-4 pt-2" style="animation-delay:0.45s">
+        <button onclick="openForm()" class="btn-glow group flex items-center gap-3 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 px-8 py-4 rounded-xl font-bold text-white shadow-xl shadow-blue-600/20 transition-all hover:shadow-blue-500/30 hover:scale-[1.02]">
           <span class="es">Solicita una demo gratis</span><span class="en">Request a free demo</span>
-          <svg class="w-5 h-5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </button>
         <p class="text-xs text-slate-500 sm:self-center">
           <span class="es">Sin compromiso — 100% gratis</span><span class="en">No commitment — 100% free</span>
@@ -192,16 +251,14 @@ html { scroll-behavior: smooth; }
     </div>
 
     <!-- Chat mockup -->
-    <div class="relative">
+    <div class="hero-stagger chat-float relative" style="animation-delay:0.5s">
       <div class="bg-[#0d1424]/80 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6 shadow-2xl shadow-black/40">
         <div class="flex items-center gap-3 pb-5 mb-5 border-b border-white/[0.06]">
           <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
             <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
           </div>
           <div>
-            <p class="text-sm font-semibold text-white">
-              <span class="es">Asistente Virtual</span><span class="en">Virtual Assistant</span>
-            </p>
+            <p class="text-sm font-semibold text-white"><span class="es">Asistente Virtual</span><span class="en">Virtual Assistant</span></p>
             <p class="text-[10px] text-emerald-400 flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               <span class="es">En línea</span><span class="en">Online</span>
@@ -209,35 +266,12 @@ html { scroll-behavior: smooth; }
           </div>
         </div>
         <div class="space-y-4">
-          <div class="flex gap-2.5">
-            <div class="bg-white/[0.06] p-3 rounded-2xl rounded-tl-sm max-w-[85%]">
-              <p class="text-[13px] leading-relaxed text-slate-300">
-                <span class="es">¡Hola! Soy el asistente virtual de tu empresa. ¿En qué puedo ayudarte?</span>
-                <span class="en">Hi! I'm your company's virtual assistant. How can I help you?</span>
-              </p>
-            </div>
-          </div>
-          <div class="flex justify-end">
-            <div class="bg-blue-600/20 border border-blue-500/20 p-3 rounded-2xl rounded-tr-sm max-w-[85%]">
-              <p class="text-[13px] leading-relaxed text-slate-200">
-                <span class="es">¿Qué cursos de inglés ofrecéis para adultos?</span>
-                <span class="en">What English courses do you offer for adults?</span>
-              </p>
-            </div>
-          </div>
-          <div class="flex gap-2.5">
-            <div class="bg-white/[0.06] p-3 rounded-2xl rounded-tl-sm max-w-[85%]">
-              <p class="text-[13px] leading-relaxed text-slate-300">
-                <span class="es">Ofrecemos cursos intensivos, clases de conversación y preparación de exámenes oficiales (Cambridge, IELTS). Los horarios son flexibles, de lunes a sábado. ¿Quieres más información?</span>
-                <span class="en">We offer intensive courses, conversation classes and official exam prep (Cambridge, IELTS). Schedules are flexible, Monday to Saturday. Want more details?</span>
-              </p>
-            </div>
-          </div>
+          <div class="flex gap-2.5"><div class="bg-white/[0.06] p-3 rounded-2xl rounded-tl-sm max-w-[85%]"><p class="text-[13px] leading-relaxed text-slate-300"><span class="es">¡Hola! Soy el asistente virtual de tu empresa. ¿En qué puedo ayudarte?</span><span class="en">Hi! I'm your company's virtual assistant. How can I help you?</span></p></div></div>
+          <div class="flex justify-end"><div class="bg-blue-600/20 border border-blue-500/20 p-3 rounded-2xl rounded-tr-sm max-w-[85%]"><p class="text-[13px] leading-relaxed text-slate-200"><span class="es">¿Qué cursos de inglés ofrecéis para adultos?</span><span class="en">What English courses do you offer for adults?</span></p></div></div>
+          <div class="flex gap-2.5"><div class="bg-white/[0.06] p-3 rounded-2xl rounded-tl-sm max-w-[85%]"><p class="text-[13px] leading-relaxed text-slate-300"><span class="es">Ofrecemos cursos intensivos, clases de conversación y preparación de exámenes oficiales (Cambridge, IELTS). Los horarios son flexibles, de lunes a sábado. ¿Quieres más información?</span><span class="en">We offer intensive courses, conversation classes and official exam prep (Cambridge, IELTS). Schedules are flexible, Monday to Saturday. Want more details?</span></p></div></div>
         </div>
         <div class="mt-5 flex gap-2">
-          <div class="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-slate-500">
-            <span class="es">Escribe un mensaje...</span><span class="en">Type a message...</span>
-          </div>
+          <div class="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-slate-500"><span class="es">Escribe un mensaje...</span><span class="en">Type a message...</span></div>
           <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
@@ -251,7 +285,7 @@ html { scroll-behavior: smooth; }
 <!-- ===================== HOW IT WORKS ===================== -->
 <section id="como-funciona" class="py-24 bg-white text-slate-900">
   <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center mb-16">
+    <div class="reveal text-center mb-16">
       <p class="text-xs font-bold tracking-[0.2em] uppercase text-blue-600 mb-4">
         <span class="es">Metodología</span><span class="en">Methodology</span>
       </p>
@@ -261,49 +295,31 @@ html { scroll-behavior: smooth; }
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Step 1 -->
-      <div class="group relative p-8 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-400 cursor-default">
+      <div class="reveal group relative p-8 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 transition-all duration-400 cursor-default" style="transition-delay:0s">
         <div class="step-num step-num-blue text-[80px] font-black leading-none mb-6">01</div>
         <div class="w-12 h-12 rounded-xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center text-blue-600 mb-5 transition-colors">
           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </div>
-        <h3 class="text-lg font-bold mb-2">
-          <span class="es">Analizamos tu web</span><span class="en">We analyze your website</span>
-        </h3>
-        <p class="text-slate-500 text-sm leading-relaxed">
-          <span class="es">Escaneamos tu contenido, servicios y preguntas frecuentes para crear una base de conocimiento única.</span>
-          <span class="en">We scan your content, services and FAQs to create a unique knowledge base.</span>
-        </p>
+        <h3 class="text-lg font-bold mb-2"><span class="es">Analizamos tu web</span><span class="en">We analyze your website</span></h3>
+        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Escaneamos tu contenido, servicios y preguntas frecuentes para crear una base de conocimiento única.</span><span class="en">We scan your content, services and FAQs to create a unique knowledge base.</span></p>
       </div>
 
-      <!-- Step 2 -->
-      <div class="group relative p-8 bg-white rounded-2xl border-2 border-slate-100 hover:border-violet-300 hover:shadow-2xl hover:shadow-violet-500/10 hover:-translate-y-1 transition-all duration-400 cursor-default">
+      <div class="reveal group relative p-8 bg-white rounded-2xl border-2 border-slate-100 hover:border-violet-300 hover:shadow-2xl hover:shadow-violet-500/10 hover:-translate-y-2 transition-all duration-400 cursor-default" style="transition-delay:0.12s">
         <div class="step-num step-num-violet text-[80px] font-black leading-none mb-6">02</div>
         <div class="w-12 h-12 rounded-xl bg-violet-50 group-hover:bg-violet-100 flex items-center justify-center text-violet-600 mb-5 transition-colors">
           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>
         </div>
-        <h3 class="text-lg font-bold mb-2">
-          <span class="es">Creamos tu chatbot</span><span class="en">We build your chatbot</span>
-        </h3>
-        <p class="text-slate-500 text-sm leading-relaxed">
-          <span class="es">Configuramos la IA para que responda con el tono y la identidad de tu marca. No es una plantilla: es a medida.</span>
-          <span class="en">We configure the AI to respond with your brand's tone and identity. It's not a template: it's custom-built.</span>
-        </p>
+        <h3 class="text-lg font-bold mb-2"><span class="es">Creamos tu chatbot</span><span class="en">We build your chatbot</span></h3>
+        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Configuramos la IA para que responda con el tono y la identidad de tu marca. No es una plantilla: es a medida.</span><span class="en">We configure the AI to respond with your brand's tone and identity. It's not a template: it's custom-built.</span></p>
       </div>
 
-      <!-- Step 3 -->
-      <div class="group relative p-8 bg-white rounded-2xl border-2 border-slate-100 hover:border-emerald-300 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-400 cursor-default">
+      <div class="reveal group relative p-8 bg-white rounded-2xl border-2 border-slate-100 hover:border-emerald-300 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-400 cursor-default" style="transition-delay:0.24s">
         <div class="step-num step-num-emerald text-[80px] font-black leading-none mb-6">03</div>
         <div class="w-12 h-12 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center text-emerald-600 mb-5 transition-colors">
           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-5-6-5"/><path d="M12 19h8"/></svg>
         </div>
-        <h3 class="text-lg font-bold mb-2">
-          <span class="es">Lo instalamos en tu web</span><span class="en">We install it on your site</span>
-        </h3>
-        <p class="text-slate-500 text-sm leading-relaxed">
-          <span class="es">Una línea de código y tu chatbot está activo atendiendo clientes desde el primer día.</span>
-          <span class="en">One line of code and your chatbot is live serving customers from day one.</span>
-        </p>
+        <h3 class="text-lg font-bold mb-2"><span class="es">Lo instalamos en tu web</span><span class="en">We install it on your site</span></h3>
+        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Una línea de código y tu chatbot está activo atendiendo clientes desde el primer día.</span><span class="en">One line of code and your chatbot is live serving customers from day one.</span></p>
       </div>
     </div>
   </div>
@@ -312,59 +328,40 @@ html { scroll-behavior: smooth; }
 <!-- ===================== BENEFITS ===================== -->
 <section id="ventajas" class="py-24 bg-slate-50 text-slate-900">
   <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center mb-16">
-      <p class="text-xs font-bold tracking-[0.2em] uppercase text-blue-600 mb-4">
-        <span class="es">Ventajas</span><span class="en">Benefits</span>
-      </p>
-      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-        <span class="es">¿Por qué Prevolto?</span><span class="en">Why Prevolto?</span>
-      </h2>
-      <p class="text-slate-500 text-lg max-w-xl mx-auto mt-4">
-        <span class="es">No es solo un chat. Es un motor de crecimiento que entiende tu negocio.</span>
-        <span class="en">It's not just a chat. It's a growth engine that understands your business.</span>
-      </p>
+    <div class="reveal text-center mb-16">
+      <p class="text-xs font-bold tracking-[0.2em] uppercase text-blue-600 mb-4"><span class="es">Ventajas</span><span class="en">Benefits</span></p>
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight"><span class="es">¿Por qué Prevolto?</span><span class="en">Why Prevolto?</span></h2>
+      <p class="text-slate-500 text-lg max-w-xl mx-auto mt-4"><span class="es">No es solo un chat. Es un motor de crecimiento que entiende tu negocio.</span><span class="en">It's not just a chat. It's a growth engine that understands your business.</span></p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300">
+      <div class="reveal p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0s">
         <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         </div>
         <h4 class="font-bold mb-2"><span class="es">Disponible 24/7</span><span class="en">Available 24/7</span></h4>
-        <p class="text-slate-500 text-sm leading-relaxed">
-          <span class="es">Tus clientes nunca esperan. Respuestas instantáneas incluso mientras duermes.</span>
-          <span class="en">Your clients never wait. Instant responses even while you sleep.</span>
-        </p>
+        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Tus clientes nunca esperan. Respuestas instantáneas incluso mientras duermes.</span><span class="en">Your clients never wait. Instant responses even while you sleep.</span></p>
       </div>
-      <div class="p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300">
+      <div class="reveal p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.08s">
         <div class="w-11 h-11 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 mb-4">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <h4 class="font-bold mb-2"><span class="es">Tu contenido, sin inventos</span><span class="en">Your content, no hallucinations</span></h4>
-        <p class="text-slate-500 text-sm leading-relaxed">
-          <span class="es">Entrenado con la información real de tu web. No inventa, no alucina.</span>
-          <span class="en">Trained on real information from your website. No made-up answers.</span>
-        </p>
+        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Entrenado con la información real de tu web. No inventa, no alucina.</span><span class="en">Trained on real information from your website. No made-up answers.</span></p>
       </div>
-      <div class="p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300">
+      <div class="reveal p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.16s">
         <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         </div>
         <h4 class="font-bold mb-2"><span class="es">Multilingüe</span><span class="en">Multilingual</span></h4>
-        <p class="text-slate-500 text-sm leading-relaxed">
-          <span class="es">Detecta y responde automáticamente en el idioma de cada visitante.</span>
-          <span class="en">Automatically detects and responds in each visitor's language.</span>
-        </p>
+        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Detecta y responde automáticamente en el idioma de cada visitante.</span><span class="en">Automatically detects and responds in each visitor's language.</span></p>
       </div>
-      <div class="p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300">
+      <div class="reveal p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.24s">
         <div class="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m12 16 4-4-4-4"/><path d="M8 12h8"/></svg>
         </div>
         <h4 class="font-bold mb-2"><span class="es">Días, no meses</span><span class="en">Days, not months</span></h4>
-        <p class="text-slate-500 text-sm leading-relaxed">
-          <span class="es">Entrega en 3–5 días laborables. Sin semanas de desarrollo.</span>
-          <span class="en">Delivery in 3–5 business days. No weeks of development.</span>
-        </p>
+        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Entrega en 3–5 días laborables. Sin semanas de desarrollo.</span><span class="en">Delivery in 3–5 business days. No weeks of development.</span></p>
       </div>
     </div>
   </div>
@@ -375,41 +372,27 @@ html { scroll-behavior: smooth; }
   <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/[0.08] blur-[100px] rounded-full pointer-events-none"></div>
   <div class="absolute bottom-0 left-0 w-80 h-80 bg-violet-600/[0.06] blur-[100px] rounded-full pointer-events-none"></div>
   <div class="relative max-w-6xl mx-auto px-6">
-    <div class="text-center mb-16">
-      <p class="text-xs font-bold tracking-[0.2em] uppercase text-blue-400 mb-4">
-        <span class="es">Éxito comprobado</span><span class="en">Proven success</span>
-      </p>
-      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-        <span class="es">Caso real</span><span class="en">Case study</span>
-      </h2>
+    <div class="reveal text-center mb-16">
+      <p class="text-xs font-bold tracking-[0.2em] uppercase text-blue-400 mb-4"><span class="es">Éxito comprobado</span><span class="en">Proven success</span></p>
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white"><span class="es">Caso real</span><span class="en">Case study</span></h2>
     </div>
-    <div class="max-w-3xl mx-auto">
-      <div class="bg-[#0d1424]/60 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-8 sm:p-10 space-y-6">
+    <div class="reveal max-w-3xl mx-auto">
+      <div class="bg-[#0d1424]/60 backdrop-blur-xl border border-white/[0.08] border-glow rounded-2xl p-8 sm:p-10 space-y-6">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
-          <span class="text-[11px] font-semibold text-blue-400 tracking-wider uppercase">
-            <span class="es">Sector energético</span><span class="en">Energy sector</span>
-          </span>
+          <span class="text-[11px] font-semibold text-blue-400 tracking-wider uppercase"><span class="es">Sector energético</span><span class="en">Energy sector</span></span>
         </div>
-        <h3 class="text-xl sm:text-2xl font-bold text-white leading-tight">
-          <span class="es">Chatbot público para empresa de predicción energética</span>
-          <span class="en">Public chatbot for an energy forecasting company</span>
-        </h3>
-        <p class="text-slate-400 text-sm leading-relaxed">
-          <span class="es">Construimos un chatbot con IA que responde preguntas sobre servicios de forecasting energético, tendencias del mercado y noticias del sector. Entrenado con todo el contenido de la web, disponible 24/7 en todos los idiomas.</span>
-          <span class="en">We built an AI chatbot that answers questions about energy forecasting services, market trends and industry news. Trained on all website content, available 24/7 in all languages.</span>
-        </p>
+        <h3 class="text-xl sm:text-2xl font-bold text-white leading-tight"><span class="es">Chatbot público para empresa de predicción energética</span><span class="en">Public chatbot for an energy forecasting company</span></h3>
+        <p class="text-slate-400 text-sm leading-relaxed"><span class="es">Construimos un chatbot con IA que responde preguntas sobre servicios de forecasting energético, tendencias del mercado y noticias del sector. Entrenado con todo el contenido de la web, disponible 24/7 en todos los idiomas.</span><span class="en">We built an AI chatbot that answers questions about energy forecasting services, market trends and industry news. Trained on all website content, available 24/7 in all languages.</span></p>
         <div class="grid grid-cols-3 gap-4 pt-6 border-t border-white/[0.06]">
-          <div class="text-center py-3">
+          <div class="stat-pop text-center py-3" style="animation-delay:0s">
             <p class="text-2xl sm:text-3xl font-black text-white">24/7</p>
             <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1"><span class="es">Atención</span><span class="en">Support</span></p>
           </div>
-          <div class="text-center py-3">
-            <p class="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">
-              <span class="es">Todos</span><span class="en">All</span>
-            </p>
+          <div class="stat-pop text-center py-3" style="animation-delay:0.15s">
+            <p class="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400"><span class="es">Todos</span><span class="en">All</span></p>
             <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1"><span class="es">los idiomas</span><span class="en">languages</span></p>
           </div>
-          <div class="text-center py-3">
+          <div class="stat-pop text-center py-3" style="animation-delay:0.3s">
             <p class="text-2xl sm:text-3xl font-black text-white">&lt;5</p>
             <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1"><span class="es">Días entrega</span><span class="en">Days delivery</span></p>
           </div>
@@ -421,7 +404,7 @@ html { scroll-behavior: smooth; }
 
 <!-- ===================== CTA ===================== -->
 <section class="py-24 px-6">
-  <div class="max-w-4xl mx-auto relative">
+  <div class="reveal max-w-4xl mx-auto relative">
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-violet-700 p-10 sm:p-16 text-center shadow-2xl shadow-blue-600/20">
       <div class="absolute top-0 right-0 w-64 h-64 bg-white/[0.05] rounded-full -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
       <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/[0.05] rounded-full translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
@@ -437,7 +420,7 @@ html { scroll-behavior: smooth; }
         <div class="pt-4">
           <button onclick="openForm()" class="group inline-flex items-center gap-3 bg-white text-blue-700 px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-blue-50 hover:scale-[1.02] transition-all">
             <span class="es">Solicitar demo gratis</span><span class="en">Request free demo</span>
-            <svg class="w-5 h-5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
           </button>
         </div>
       </div>
@@ -448,13 +431,9 @@ html { scroll-behavior: smooth; }
 <!-- ===================== FOOTER ===================== -->
 <footer class="border-t border-white/[0.06] py-10">
   <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-    <div class="flex items-center">
-      <span class="text-sm font-bold tracking-tight text-white">Pre</span>
-      <svg class="h-[12px] w-[10px] relative top-[0.5px] -mx-[0.5px]" viewBox="0 0 14 20" fill="none">
-        <polygon points="9,0 2,11 7,11 5,20 12,9 7,9" fill="url(#bolt-ft)"/>
-        <defs><linearGradient id="bolt-ft" x1="7" y1="0" x2="7" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#60A5FA"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
-      </svg>
-      <span class="text-sm font-bold tracking-tight text-white">olto</span>
+    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+      <span class="text-sm font-bold tracking-tight text-white">Prevolto</span>
+      <span class="text-xs text-slate-500">contact@prevolto.com</span>
     </div>
     <p class="text-xs text-slate-600">&copy; 2026 Prevolto</p>
   </div>
@@ -464,75 +443,42 @@ html { scroll-behavior: smooth; }
 <div id="contact-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeForm()" style="animation:backdropIn 0.2s ease-out"></div>
   <div class="relative w-full max-w-md bg-[#0a0f1e] border border-white/[0.1] rounded-2xl shadow-2xl shadow-black/40 overflow-hidden" style="animation:modalIn 0.3s ease-out">
-
     <button onclick="closeForm()" class="absolute top-5 right-5 text-slate-500 hover:text-white transition-colors z-10">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
-
-    <!-- Form content -->
     <div id="form-content" class="p-8">
       <div class="mb-8">
-        <h3 class="text-xl font-bold text-white mb-2">
-          <span class="es">Solicita tu demo</span><span class="en">Request your demo</span>
-        </h3>
-        <p class="text-sm text-slate-400">
-          <span class="es">Te construiremos un chatbot de prueba gratis con el contenido de tu web.</span>
-          <span class="en">We'll build a free test chatbot with your website's content.</span>
-        </p>
+        <h3 class="text-xl font-bold text-white mb-2"><span class="es">Solicita tu demo</span><span class="en">Request your demo</span></h3>
+        <p class="text-sm text-slate-400"><span class="es">Te construiremos un chatbot de prueba gratis con el contenido de tu web.</span><span class="en">We'll build a free test chatbot with your website's content.</span></p>
       </div>
-
       <form id="contact-form" class="space-y-5">
         <input type="hidden" name="_subject" value="Nueva solicitud de demo — Prevolto">
         <input type="hidden" name="_captcha" value="false">
         <input type="hidden" name="_template" value="table">
-
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-1.5">
-            <span class="es">Tu web actual *</span><span class="en">Your current website *</span>
-          </label>
-          <input type="url" name="website" required placeholder="https://tuempresa.com"
-            class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all">
+          <label class="block text-sm font-medium text-slate-300 mb-1.5"><span class="es">Tu web actual *</span><span class="en">Your current website *</span></label>
+          <input type="url" name="website" required placeholder="https://tuempresa.com" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all">
         </div>
-
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-1.5">
-            <span class="es">Tu email *</span><span class="en">Your email *</span>
-          </label>
-          <input type="email" name="email" required placeholder="nombre@empresa.com"
-            class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all">
+          <label class="block text-sm font-medium text-slate-300 mb-1.5"><span class="es">Tu email *</span><span class="en">Your email *</span></label>
+          <input type="email" name="email" required placeholder="nombre@empresa.com" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all">
         </div>
-
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-1.5">
-            <span class="es">Mensaje <span class="text-slate-600">(opcional)</span></span>
-            <span class="en">Message <span class="text-slate-600">(optional)</span></span>
-          </label>
-          <textarea name="message" rows="3" placeholder=""
-            class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all resize-none"></textarea>
+          <label class="block text-sm font-medium text-slate-300 mb-1.5"><span class="es">Mensaje <span class="text-slate-600">(opcional)</span></span><span class="en">Message <span class="text-slate-600">(optional)</span></span></label>
+          <textarea name="message" rows="3" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all resize-none"></textarea>
         </div>
-
-        <button type="submit" id="submit-btn"
-          class="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold py-3.5 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-600/20">
+        <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold py-3.5 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-600/20">
           <span class="es">Enviar solicitud</span><span class="en">Send request</span>
         </button>
       </form>
     </div>
-
-    <!-- Success state -->
     <div id="form-success" class="hidden p-8 text-center py-16">
       <div class="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
         <svg class="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
       </div>
-      <h3 class="text-xl font-bold text-white mb-2">
-        <span class="es">¡Solicitud enviada!</span><span class="en">Request sent!</span>
-      </h3>
-      <p class="text-sm text-slate-400 mb-8">
-        <span class="es">Te contactaremos pronto con tu demo personalizada.</span>
-        <span class="en">We'll contact you soon with your personalized demo.</span>
-      </p>
-      <button onclick="closeForm()" class="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors">
-        <span class="es">Cerrar</span><span class="en">Close</span>
-      </button>
+      <h3 class="text-xl font-bold text-white mb-2"><span class="es">¡Solicitud enviada!</span><span class="en">Request sent!</span></h3>
+      <p class="text-sm text-slate-400 mb-8"><span class="es">Te contactaremos pronto con tu demo personalizada.</span><span class="en">We'll contact you soon with your personalized demo.</span></p>
+      <button onclick="closeForm()" class="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors"><span class="es">Cerrar</span><span class="en">Close</span></button>
     </div>
   </div>
 </div>
@@ -541,14 +487,13 @@ html { scroll-behavior: smooth; }
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[100]">
   <div class="flex items-center gap-2 bg-white text-slate-900 px-5 py-3 rounded-xl shadow-2xl shadow-black/20">
     <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-    <span class="text-sm font-medium" id="toast-msg">
-      <span class="es">¡Solicitud enviada!</span><span class="en">Request sent!</span>
-    </span>
+    <span class="text-sm font-medium"><span class="es">¡Solicitud enviada!</span><span class="en">Request sent!</span></span>
   </div>
 </div>
 
 <!-- ===================== JS ===================== -->
 <script>
+// Language
 function setLang(lang) {
   document.documentElement.lang = lang;
   document.getElementById('btn-es').className = lang === 'es'
@@ -557,24 +502,22 @@ function setLang(lang) {
   document.getElementById('btn-en').className = lang === 'en'
     ? 'px-2.5 py-1 rounded-full text-xs font-semibold transition-all bg-white/10 text-white'
     : 'px-2.5 py-1 rounded-full text-xs font-semibold transition-all text-slate-500 hover:text-slate-300';
-  // Update placeholders
   var w = document.querySelector('[name="website"]');
   var e = document.querySelector('[name="email"]');
   var m = document.querySelector('[name="message"]');
   if (w) w.placeholder = lang === 'es' ? 'https://tuempresa.com' : 'https://yourcompany.com';
   if (e) e.placeholder = lang === 'es' ? 'nombre@empresa.com' : 'name@company.com';
-  if (m) m.placeholder = lang === 'es' ? 'Cuéntanos sobre tu negocio...' : 'Tell us about your business...';
+  if (m) m.placeholder = lang === 'es' ? '¿Alguna aclaración o pregunta?' : 'Any clarification or question?';
 }
 
+// Form modal
 function openForm() {
   document.getElementById('contact-modal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
-
 function closeForm() {
   document.getElementById('contact-modal').classList.add('hidden');
   document.body.style.overflow = '';
-  // Reset form after closing
   setTimeout(function() {
     document.getElementById('form-content').classList.remove('hidden');
     document.getElementById('form-success').classList.add('hidden');
@@ -585,32 +528,52 @@ function closeForm() {
   }, 300);
 }
 
-// Form submission via Formsubmit.co
+// Form submit
 document.getElementById('contact-form').addEventListener('submit', async function(ev) {
   ev.preventDefault();
   var btn = document.getElementById('submit-btn');
   var lang = document.documentElement.lang;
   btn.disabled = true;
   btn.textContent = lang === 'es' ? 'Enviando...' : 'Sending...';
-
   try {
     var resp = await fetch('https://formsubmit.co/ajax/contact@prevolto.com', {
-      method: 'POST',
-      body: new FormData(this),
-      headers: { 'Accept': 'application/json' }
+      method: 'POST', body: new FormData(this), headers: { 'Accept': 'application/json' }
     });
     if (resp.ok) {
       document.getElementById('form-content').classList.add('hidden');
       document.getElementById('form-success').classList.remove('hidden');
-    } else {
-      throw new Error('fail');
-    }
+    } else { throw new Error('fail'); }
   } catch(e) {
     btn.disabled = false;
     btn.innerHTML = '<span class="es">Enviar solicitud</span><span class="en">Send request</span>';
     alert(lang === 'es' ? 'Error al enviar. Inténtalo de nuevo.' : 'Failed to send. Please try again.');
   }
 });
+
+// Scroll reveal
+var revealObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(function(el) { revealObs.observe(el); });
+
+// Stat pop animation
+var statObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      statObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.stat-pop').forEach(function(el) { statObs.observe(el); });
+
+// Set initial placeholder
+setLang('es');
 </script>
 </body>
 </html>
