@@ -182,7 +182,10 @@ html { scroll-behavior: smooth; }
 <nav class="fixed top-0 w-full z-50 border-b border-white/[0.06]">
   <div class="absolute inset-0 bg-[#050a18]/70 backdrop-blur-2xl"></div>
   <div class="relative max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-    <a href="/" class="text-lg font-bold tracking-tight text-white hover:opacity-80 transition-opacity">Prevolto</a>
+    <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+      <img src="/assets/logo.png" alt="Prevolto" class="h-8 w-auto">
+      <span class="text-lg font-bold tracking-tight text-white">Prevolto</span>
+    </a>
 
     <div class="hidden md:flex items-center gap-8">
       <a href="#como-funciona" class="text-[13px] text-slate-400 hover:text-white transition-colors">
@@ -431,7 +434,7 @@ html { scroll-behavior: smooth; }
 <!-- ===================== FOOTER ===================== -->
 <footer class="border-t border-white/[0.06] py-10">
   <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
-    <span class="text-sm font-bold tracking-tight text-white">Prevolto</span>
+    <span class="flex items-center gap-2"><img src="/assets/logo.png" alt="Prevolto" class="h-6 w-auto"><span class="text-sm font-bold tracking-tight text-white">Prevolto</span></span>
     <span class="text-sm text-slate-400">contact@prevolto.com</span>
     <p class="text-xs text-slate-600">&copy; 2026 Prevolto</p>
   </div>
@@ -572,6 +575,328 @@ document.querySelectorAll('.stat-pop').forEach(function(el) { statObs.observe(el
 
 // Set initial placeholder
 setLang('es');
+</script>
+
+<!-- ===================== CHATBOT WIDGET ===================== -->
+<style>
+/* ---- Chatbot ---- */
+@keyframes chatBtnPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+  50% { box-shadow: 0 0 0 14px rgba(99,102,241,0); }
+}
+@keyframes chatSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes chatSlideDown {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(20px) scale(0.95); }
+}
+@keyframes typingDot {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+#chat-widget-btn {
+  animation: chatBtnPulse 3s ease-in-out infinite;
+}
+#chat-widget-btn:hover {
+  animation: none;
+  transform: scale(1.08);
+}
+
+#chat-panel {
+  animation: chatSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+#chat-panel.closing {
+  animation: chatSlideDown 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.typing-dot {
+  animation: typingDot 1.4s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+#chat-messages::-webkit-scrollbar { width: 4px; }
+#chat-messages::-webkit-scrollbar-track { background: transparent; }
+#chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+.chat-msg-bot {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: chatSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.chat-msg-user {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: chatSlideUp 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+</style>
+
+<!-- Floating chat button -->
+<button id="chat-widget-btn" onclick="toggleChat()" class="fixed bottom-6 right-6 z-[55] w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white shadow-xl shadow-indigo-600/30 flex items-center justify-center transition-all duration-300 cursor-pointer">
+  <svg id="chat-icon-open" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+  <svg id="chat-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+</button>
+
+<!-- Chat panel -->
+<div id="chat-panel" class="hidden fixed bottom-24 right-6 z-[55] w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl overflow-hidden shadow-2xl shadow-black/40 border border-white/[0.1]">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-4">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+        <img src="/assets/logo.png" alt="Prevolto" class="h-5 w-auto brightness-0 invert">
+      </div>
+      <div class="flex-1">
+        <p class="text-sm font-semibold text-white">Prevolto</p>
+        <p class="text-[10px] text-white/70 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span class="es">En línea</span><span class="en">Online</span>
+        </p>
+      </div>
+      <button onclick="toggleChat()" class="text-white/60 hover:text-white transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div id="chat-messages" class="bg-[#0a0f1e] px-4 py-4 h-[340px] overflow-y-auto space-y-3">
+    <!-- Welcome message injected by JS -->
+  </div>
+
+  <!-- Quick replies -->
+  <div id="chat-quick-replies" class="bg-[#0a0f1e] px-4 pb-2 flex flex-wrap gap-2">
+  </div>
+
+  <!-- Input -->
+  <div class="bg-[#0d1424] border-t border-white/[0.06] px-4 py-3 flex gap-2">
+    <input id="chat-input" type="text" class="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/40 transition-all" onkeydown="if(event.key==='Enter')sendChatMsg()">
+    <button onclick="sendChatMsg()" class="w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-xl flex items-center justify-center text-white shrink-0 transition-colors">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  var chatOpen = false;
+  var chatInitialized = false;
+
+  // Knowledge base — responses keyed by intent
+  var kb = {
+    es: {
+      welcome: '¡Hola! 👋 Soy el asistente virtual de Prevolto. ¿En qué puedo ayudarte?',
+      quickReplies: ['¿Qué es Prevolto?', '¿Cómo funciona?', '¿Cuánto cuesta?', 'Quiero una demo'],
+      responses: {
+        'que_es': 'Prevolto crea **chatbots con IA** entrenados con el contenido de tu web. Responden preguntas de tus clientes, captan leads y atienden consultas **24/7** — sin que tengas que hacer nada.',
+        'como_funciona': 'Es muy sencillo:\n\n**1.** Analizamos tu web y extraemos tu contenido.\n**2.** Creamos un chatbot personalizado con el tono de tu marca.\n**3.** Lo instalamos con una línea de código.\n\n¡Listo en 3-5 días!',
+        'precio': 'Ofrecemos una **demo totalmente gratis** para que veas cómo funcionaría en tu negocio. Los planes se adaptan al tamaño de tu empresa. ¿Quieres que te preparemos una demo sin compromiso?',
+        'demo': '¡Genial! Te preparamos un chatbot de prueba gratis con el contenido de tu web. Solo necesito tu web y email. ¿Te abro el formulario de contacto?',
+        'idiomas': 'Nuestros chatbots son **multilingües**. Detectan automáticamente el idioma del visitante y responden en ese idioma. Español, inglés, francés, alemán… sin configuración extra.',
+        'ventajas': '¿Por qué Prevolto?\n\n• **24/7** — Nunca pierdes un cliente por horario.\n• **Tu contenido** — No inventa respuestas.\n• **Multilingüe** — Habla el idioma de cada visitante.\n• **Rápido** — Listo en 3-5 días.',
+        'contacto': 'Puedes escribirnos a **contact@prevolto.com** o usar el formulario de contacto de la web. ¿Quieres que lo abra ahora?',
+        'fallback': 'Interesante pregunta. Para darte la mejor respuesta, te recomiendo contactar con nuestro equipo. ¿Quieres que abra el formulario de contacto?'
+      }
+    },
+    en: {
+      welcome: 'Hi! 👋 I\'m Prevolto\'s virtual assistant. How can I help you?',
+      quickReplies: ['What is Prevolto?', 'How does it work?', 'How much does it cost?', 'I want a demo'],
+      responses: {
+        'que_es': 'Prevolto creates **AI chatbots** trained on your website content. They answer customer questions, capture leads and handle inquiries **24/7** — without you lifting a finger.',
+        'como_funciona': 'It\'s very simple:\n\n**1.** We analyze your website and extract your content.\n**2.** We create a custom chatbot with your brand\'s tone.\n**3.** We install it with one line of code.\n\nReady in 3-5 days!',
+        'precio': 'We offer a **completely free demo** so you can see how it would work for your business. Plans adapt to your company size. Want us to prepare a no-commitment demo?',
+        'demo': 'Great! We\'ll build a free test chatbot with your website content. I just need your website and email. Shall I open the contact form?',
+        'idiomas': 'Our chatbots are **multilingual**. They automatically detect the visitor\'s language and respond in it. Spanish, English, French, German… no extra setup needed.',
+        'ventajas': 'Why Prevolto?\n\n• **24/7** — Never lose a client due to business hours.\n• **Your content** — No made-up answers.\n• **Multilingual** — Speaks each visitor\'s language.\n• **Fast** — Ready in 3-5 days.',
+        'contacto': 'You can email us at **contact@prevolto.com** or use the contact form on the website. Want me to open it now?',
+        'fallback': 'Great question. For the best answer, I\'d recommend reaching out to our team. Want me to open the contact form?'
+      }
+    }
+  };
+
+  // Intent detection
+  function detectIntent(msg) {
+    var m = msg.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (/que es|what is|que haceis|what do you do|about prevolto/.test(m)) return 'que_es';
+    if (/como funciona|how does it work|how it works|pasos|steps|proceso|process/.test(m)) return 'como_funciona';
+    if (/precio|cost|cuanto|how much|plan|tarifa|rate|pagar|pay/.test(m)) return 'precio';
+    if (/demo|prueba|probar|trial|test|try/.test(m)) return 'demo';
+    if (/idioma|language|multilingu|ingles|english|frances|french/.test(m)) return 'idiomas';
+    if (/ventaja|benefi|por que|why prevolto|features/.test(m)) return 'ventajas';
+    if (/contacto|contact|email|correo|escribir|reach/.test(m)) return 'contacto';
+    if (/hola|hello|hi |hey|buenas|buenos/.test(m)) return 'welcome_reply';
+    if (/gracias|thank|genial|great|perfecto|perfect/.test(m)) return 'thanks';
+    return 'fallback';
+  }
+
+  // Simple markdown bold
+  function miniMarkdown(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function getLang() { return document.documentElement.lang || 'es'; }
+
+  function addMsg(text, isUser) {
+    var box = document.getElementById('chat-messages');
+    var div = document.createElement('div');
+    div.className = isUser ? 'flex justify-end chat-msg-user' : 'flex chat-msg-bot';
+    var bubble = document.createElement('div');
+    bubble.className = isUser
+      ? 'bg-blue-600/20 border border-blue-500/20 px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[85%]'
+      : 'bg-white/[0.06] px-4 py-2.5 rounded-2xl rounded-tl-sm max-w-[85%]';
+    bubble.innerHTML = '<p class="text-[13px] leading-relaxed text-slate-300">' + miniMarkdown(text) + '</p>';
+    div.appendChild(bubble);
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function showTyping() {
+    var box = document.getElementById('chat-messages');
+    var div = document.createElement('div');
+    div.id = 'typing-indicator';
+    div.className = 'flex chat-msg-bot';
+    div.innerHTML = '<div class="bg-white/[0.06] px-4 py-3 rounded-2xl rounded-tl-sm"><div class="flex gap-1.5"><span class="typing-dot w-2 h-2 rounded-full bg-slate-400"></span><span class="typing-dot w-2 h-2 rounded-full bg-slate-400"></span><span class="typing-dot w-2 h-2 rounded-full bg-slate-400"></span></div></div>';
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function removeTyping() {
+    var el = document.getElementById('typing-indicator');
+    if (el) el.remove();
+  }
+
+  function showQuickReplies(replies) {
+    var container = document.getElementById('chat-quick-replies');
+    container.innerHTML = '';
+    replies.forEach(function(r) {
+      var btn = document.createElement('button');
+      btn.className = 'text-[11px] font-medium px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-all';
+      btn.textContent = r;
+      btn.onclick = function() {
+        container.innerHTML = '';
+        processMsg(r);
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function processMsg(msg) {
+    addMsg(msg, true);
+    var lang = getLang();
+    var data = kb[lang] || kb.es;
+    var intent = detectIntent(msg);
+
+    showTyping();
+
+    var delay = 600 + Math.random() * 800;
+    setTimeout(function() {
+      removeTyping();
+
+      if (intent === 'welcome_reply') {
+        var greetings = lang === 'es'
+          ? '¡Hola! ¿En qué puedo ayudarte hoy? Puedo contarte sobre nuestros chatbots, cómo funcionan, o prepararte una demo gratis.'
+          : 'Hello! How can I help you today? I can tell you about our chatbots, how they work, or set up a free demo.';
+        addMsg(greetings, false);
+        showQuickReplies(data.quickReplies);
+        return;
+      }
+
+      if (intent === 'thanks') {
+        var thanksMsg = lang === 'es'
+          ? '¡De nada! Si tienes más preguntas, aquí estaré. 😊'
+          : 'You\'re welcome! If you have more questions, I\'m here. 😊';
+        addMsg(thanksMsg, false);
+        return;
+      }
+
+      var response = data.responses[intent] || data.responses.fallback;
+      addMsg(response, false);
+
+      // After demo/contact/fallback/price — offer to open form
+      if (['demo', 'contacto', 'fallback', 'precio'].indexOf(intent) !== -1) {
+        setTimeout(function() {
+          var btns = lang === 'es'
+            ? ['Abrir formulario', '¿Qué es Prevolto?', '¿Cómo funciona?']
+            : ['Open contact form', 'What is Prevolto?', 'How does it work?'];
+          var container = document.getElementById('chat-quick-replies');
+          container.innerHTML = '';
+          btns.forEach(function(r, i) {
+            var btn = document.createElement('button');
+            btn.className = 'text-[11px] font-medium px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-all';
+            btn.textContent = r;
+            btn.onclick = function() {
+              container.innerHTML = '';
+              if (i === 0) {
+                openForm();
+                addMsg(r, true);
+                setTimeout(function() {
+                  addMsg(lang === 'es' ? '¡Formulario abierto! Rellénalo y nos pondremos en contacto contigo.' : 'Form opened! Fill it in and we\'ll get in touch.', false);
+                }, 400);
+              } else {
+                processMsg(r);
+              }
+            };
+            container.appendChild(btn);
+          });
+        }, 300);
+      } else {
+        setTimeout(function() { showQuickReplies(data.quickReplies); }, 300);
+      }
+    }, delay);
+  }
+
+  // Initialize chat
+  function initChat() {
+    if (chatInitialized) return;
+    chatInitialized = true;
+    var lang = getLang();
+    var data = kb[lang] || kb.es;
+    document.getElementById('chat-input').placeholder = lang === 'es' ? 'Escribe un mensaje...' : 'Type a message...';
+    addMsg(data.welcome, false);
+    setTimeout(function() { showQuickReplies(data.quickReplies); }, 400);
+  }
+
+  // Toggle chat
+  window.toggleChat = function() {
+    var panel = document.getElementById('chat-panel');
+    var iconOpen = document.getElementById('chat-icon-open');
+    var iconClose = document.getElementById('chat-icon-close');
+
+    if (chatOpen) {
+      panel.classList.add('closing');
+      setTimeout(function() {
+        panel.classList.add('hidden');
+        panel.classList.remove('closing');
+      }, 250);
+      iconOpen.classList.remove('hidden');
+      iconClose.classList.add('hidden');
+    } else {
+      panel.classList.remove('hidden');
+      panel.classList.remove('closing');
+      iconOpen.classList.add('hidden');
+      iconClose.classList.remove('hidden');
+      initChat();
+      setTimeout(function() {
+        document.getElementById('chat-input').focus();
+      }, 100);
+    }
+    chatOpen = !chatOpen;
+  };
+
+  // Send message
+  window.sendChatMsg = function() {
+    var input = document.getElementById('chat-input');
+    var msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    document.getElementById('chat-quick-replies').innerHTML = '';
+    processMsg(msg);
+  };
+})();
 </script>
 </body>
 </html>
