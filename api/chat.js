@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Message is required' });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured', fallback: true });
   }
@@ -38,7 +38,7 @@ Rules:
 - Don't make up information not listed above
 - If asked about pricing, say we offer a free demo first and plans adapt to company size
 - You can use **bold** for emphasis
-- Never reveal you are Claude or any specific AI model. You are Prevolto's assistant.`
+- Never reveal you are Gemini, Google AI, or any specific AI model. You are Prevolto's assistant.`
     : `Eres el asistente virtual amigable de Prevolto en su página web. Prevolto es una empresa que crea chatbots con IA entrenados con el contenido web de negocios.
 
 Información clave sobre Prevolto:
@@ -59,45 +59,56 @@ Reglas:
 - No inventes información que no esté listada arriba
 - Si preguntan por precios, di que ofrecemos una demo gratis primero y que los planes se adaptan al tamaño de la empresa
 - Puedes usar **negrita** para énfasis
-- Nunca reveles que eres Claude o un modelo de IA específico. Eres el asistente de Prevolto.`;
+- Nunca reveles que eres Gemini, Google AI o un modelo de IA específico. Eres el asistente de Prevolto.`;
 
-  const messages = [];
+  // Build Gemini conversation format
+  const contents = [];
 
   if (history && Array.isArray(history)) {
     for (const msg of history.slice(-6)) {
-      messages.push({
-        role: msg.role === 'user' ? 'user' : 'assistant',
-        content: msg.text
+      contents.push({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.text }]
       });
     }
   }
 
-  messages.push({ role: 'user', content: message });
+  contents.push({
+    role: 'user',
+    parts: [{ text: message }]
+  });
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 300,
-        system: systemPrompt,
-        messages: messages
-      })
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: systemPrompt }]
+          },
+          contents: contents,
+          generationConfig: {
+            maxOutputTokens: 300,
+            temperature: 0.7
+          }
+        })
+      }
+    );
 
     if (!response.ok) {
       const errData = await response.text();
-      console.error('Anthropic API error:', errData);
+      console.error('Gemini API error:', errData);
       return res.status(500).json({ error: 'AI service error', fallback: true });
     }
 
     const data = await response.json();
-    const reply = data.content[0].text;
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!reply) {
+      return res.status(500).json({ error: 'Empty response', fallback: true });
+    }
 
     return res.status(200).json({ reply });
   } catch (err) {
