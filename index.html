@@ -828,23 +828,39 @@ setLang('es');
   // Call AI API
   async function callAI(msg) {
     try {
+      // Filter history: only user messages and AI replies (skip welcome), ensure starts with user
+      var filteredHistory = chatHistory.filter(function(m) { return m.role === 'user' || m.role === 'assistant'; }).slice(-8);
+      // Gemini requires first message to be from user
+      while (filteredHistory.length > 0 && filteredHistory[0].role !== 'user') {
+        filteredHistory.shift();
+      }
+
       var resp = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: msg,
           lang: getLang(),
-          history: chatHistory.slice(-8)
+          history: filteredHistory
         })
       });
+
+      if (!resp.ok) {
+        console.warn('Chat API returned', resp.status);
+        aiAvailable = false;
+        return null;
+      }
+
       var data = await resp.json();
-      if (data.fallback) {
+      if (data.fallback || data.error) {
+        console.warn('Chat API fallback:', data.error);
         aiAvailable = false;
         return null;
       }
       aiAvailable = true;
       return data.reply;
     } catch (e) {
+      console.warn('Chat API error:', e);
       aiAvailable = false;
       return null;
     }

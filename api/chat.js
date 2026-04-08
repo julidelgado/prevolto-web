@@ -66,17 +66,29 @@ Reglas:
 
   if (history && Array.isArray(history)) {
     for (const msg of history.slice(-6)) {
+      const role = msg.role === 'user' ? 'user' : 'model';
+      // Gemini requires alternating roles and must start with 'user'
+      if (contents.length === 0 && role !== 'user') continue;
+      // Skip if same role as previous (Gemini doesn't allow consecutive same-role)
+      if (contents.length > 0 && contents[contents.length - 1].role === role) continue;
       contents.push({
-        role: msg.role === 'user' ? 'user' : 'model',
+        role: role,
         parts: [{ text: msg.text }]
       });
     }
+  }
+
+  // Ensure last history entry isn't 'user' since we're about to add one
+  if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+    contents.pop();
   }
 
   contents.push({
     role: 'user',
     parts: [{ text: message }]
   });
+
+  console.log('Gemini request - contents count:', contents.length, 'apiKey set:', !!apiKey);
 
   try {
     const response = await fetch(
