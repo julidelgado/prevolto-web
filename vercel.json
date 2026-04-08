@@ -1,8 +1,7 @@
 {
-  "framework": null,
-  "installCommand": "echo skip",
-  "buildCommand": "echo skip",
-  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/api/chat", "destination": "/api/chat" }
+  ],
   "functions": {
     "api/chat.js": {
       "maxDuration": 15
