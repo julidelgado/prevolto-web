@@ -173,6 +173,76 @@ html { scroll-behavior: smooth; }
 .stat-pop.visible {
   animation: statPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ---- Rotating words ---- */
+@keyframes wordRotateIn {
+  0% { opacity: 0; transform: translateY(100%); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes wordRotateOut {
+  0% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  100% { opacity: 0; transform: translateY(-100%); filter: blur(8px); }
+}
+.word-rotate-container {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.word-rotate-container .word {
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  opacity: 0;
+}
+.word-rotate-container .word.active {
+  position: relative;
+  animation: wordRotateIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.word-rotate-container .word.exit {
+  animation: wordRotateOut 0.5s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+/* ---- Spotlight card effect ---- */
+.card-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.card-spotlight::before {
+  content: '';
+  position: absolute;
+  top: var(--mouse-y, -100px);
+  left: var(--mouse-x, -100px);
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+.card-spotlight:hover::before {
+  opacity: 1;
+}
+
+/* ---- Gooey text morphing ---- */
+.gooey-filter {
+  filter: url(#gooey-threshold);
+}
+.gooey-text {
+  position: absolute;
+  display: inline-block;
+  user-select: none;
+}
+
+/* ---- Particle dots ---- */
+@keyframes particleFloat {
+  0%, 100% { transform: translate(0, 0); opacity: 0.3; }
+  25% { transform: translate(10px, -20px); opacity: 0.7; }
+  50% { transform: translate(-5px, -40px); opacity: 0.5; }
+  75% { transform: translate(15px, -25px); opacity: 0.8; }
+}
 </style>
 </head>
 
@@ -213,12 +283,18 @@ html { scroll-behavior: smooth; }
 
 <!-- ===================== HERO ===================== -->
 <section class="relative min-h-screen flex items-center pt-16 overflow-hidden">
+  <!-- Enhanced aurora background -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute top-[-15%] left-[-5%] w-[500px] h-[500px] rounded-full bg-blue-600/[0.15] blur-[100px]" style="animation:aurora-1 20s ease-in-out infinite"></div>
-    <div class="absolute top-[-5%] right-[-10%] w-[600px] h-[600px] rounded-full bg-violet-600/[0.12] blur-[120px]" style="animation:aurora-2 25s ease-in-out infinite"></div>
-    <div class="absolute bottom-[-10%] left-[20%] w-[400px] h-[400px] rounded-full bg-indigo-500/[0.1] blur-[100px]" style="animation:aurora-3 22s ease-in-out infinite"></div>
+    <div class="absolute top-[-15%] left-[-5%] w-[500px] h-[500px] rounded-full bg-blue-600/[0.18] blur-[100px]" style="animation:aurora-1 20s ease-in-out infinite"></div>
+    <div class="absolute top-[-5%] right-[-10%] w-[600px] h-[600px] rounded-full bg-violet-600/[0.15] blur-[120px]" style="animation:aurora-2 25s ease-in-out infinite"></div>
+    <div class="absolute bottom-[-10%] left-[20%] w-[400px] h-[400px] rounded-full bg-indigo-500/[0.12] blur-[100px]" style="animation:aurora-3 22s ease-in-out infinite"></div>
+    <div class="absolute top-[30%] right-[10%] w-[300px] h-[300px] rounded-full bg-cyan-500/[0.08] blur-[80px]" style="animation:aurora-1 18s ease-in-out infinite reverse"></div>
+    <div class="absolute bottom-[5%] right-[30%] w-[350px] h-[350px] rounded-full bg-purple-600/[0.08] blur-[90px]" style="animation:aurora-2 28s ease-in-out infinite reverse"></div>
   </div>
   <div class="absolute inset-0 grid-bg pointer-events-none"></div>
+
+  <!-- Floating particles -->
+  <div id="hero-particles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
 
   <div class="relative max-w-6xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-20 lg:py-0">
     <div class="space-y-8">
@@ -232,8 +308,9 @@ html { scroll-behavior: smooth; }
       <h1 class="hero-stagger text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight" style="animation-delay:0.15s">
         <span class="es">Tu negocio responde a clientes </span>
         <span class="en">Your business responds to clients </span>
+        <br>
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-violet-400 to-purple-400 animated-gradient">
-          <span class="es">24/7, sin esfuerzo</span><span class="en">24/7, effortlessly</span>
+          <span class="word-rotate-container" id="hero-rotating-words"></span>
         </span>
       </h1>
 
@@ -338,33 +415,41 @@ html { scroll-behavior: smooth; }
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="reveal p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0s">
-        <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <div class="reveal card-spotlight p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0s">
+        <div class="relative z-10">
+          <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <h4 class="font-bold mb-2"><span class="es">Disponible 24/7</span><span class="en">Available 24/7</span></h4>
+          <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Tus clientes nunca esperan. Respuestas instantáneas incluso mientras duermes.</span><span class="en">Your clients never wait. Instant responses even while you sleep.</span></p>
         </div>
-        <h4 class="font-bold mb-2"><span class="es">Disponible 24/7</span><span class="en">Available 24/7</span></h4>
-        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Tus clientes nunca esperan. Respuestas instantáneas incluso mientras duermes.</span><span class="en">Your clients never wait. Instant responses even while you sleep.</span></p>
       </div>
-      <div class="reveal p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.08s">
-        <div class="w-11 h-11 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 mb-4">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="reveal card-spotlight p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.08s">
+        <div class="relative z-10">
+          <div class="w-11 h-11 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 mb-4">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h4 class="font-bold mb-2"><span class="es">Tu contenido, sin inventos</span><span class="en">Your content, no hallucinations</span></h4>
+          <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Entrenado con la información real de tu web. No inventa, no alucina.</span><span class="en">Trained on real information from your website. No made-up answers.</span></p>
         </div>
-        <h4 class="font-bold mb-2"><span class="es">Tu contenido, sin inventos</span><span class="en">Your content, no hallucinations</span></h4>
-        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Entrenado con la información real de tu web. No inventa, no alucina.</span><span class="en">Trained on real information from your website. No made-up answers.</span></p>
       </div>
-      <div class="reveal p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.16s">
-        <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+      <div class="reveal card-spotlight p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.16s">
+        <div class="relative z-10">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </div>
+          <h4 class="font-bold mb-2"><span class="es">Multilingüe</span><span class="en">Multilingual</span></h4>
+          <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Detecta y responde automáticamente en el idioma de cada visitante.</span><span class="en">Automatically detects and responds in each visitor's language.</span></p>
         </div>
-        <h4 class="font-bold mb-2"><span class="es">Multilingüe</span><span class="en">Multilingual</span></h4>
-        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Detecta y responde automáticamente en el idioma de cada visitante.</span><span class="en">Automatically detects and responds in each visitor's language.</span></p>
       </div>
-      <div class="reveal p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.24s">
-        <div class="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m12 16 4-4-4-4"/><path d="M8 12h8"/></svg>
+      <div class="reveal card-spotlight p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0.24s">
+        <div class="relative z-10">
+          <div class="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m12 16 4-4-4-4"/><path d="M8 12h8"/></svg>
+          </div>
+          <h4 class="font-bold mb-2"><span class="es">Días, no meses</span><span class="en">Days, not months</span></h4>
+          <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Entrega en 3–5 días laborables. Sin semanas de desarrollo.</span><span class="en">Delivery in 3–5 business days. No weeks of development.</span></p>
         </div>
-        <h4 class="font-bold mb-2"><span class="es">Días, no meses</span><span class="en">Days, not months</span></h4>
-        <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Entrega en 3–5 días laborables. Sin semanas de desarrollo.</span><span class="en">Delivery in 3–5 business days. No weeks of development.</span></p>
       </div>
     </div>
   </div>
@@ -645,7 +730,7 @@ setLang('es');
   <!-- Header -->
   <div class="bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-4">
     <div class="flex items-center gap-3">
-      <img src="/assets/logo.png" alt="Prevolto" class="w-9 h-9 rounded-lg object-cover">
+      <img src="/assets/logo-icon.png" alt="Prevolto" class="w-9 h-9 rounded-full object-cover shadow-md">
       <div class="flex-1">
         <p class="text-sm font-semibold text-white">Prevolto</p>
         <p class="text-[10px] text-white/70 flex items-center gap-1">
@@ -681,55 +766,14 @@ setLang('es');
 (function() {
   var chatOpen = false;
   var chatInitialized = false;
+  var chatHistory = [];
+  var aiAvailable = null; // null = unknown, true/false after first attempt
 
-  // Knowledge base — responses keyed by intent
-  var kb = {
-    es: {
-      welcome: '¡Hola! 👋 Soy el asistente virtual de Prevolto. ¿En qué puedo ayudarte?',
-      quickReplies: ['¿Qué es Prevolto?', '¿Cómo funciona?', '¿Cuánto cuesta?', 'Quiero una demo'],
-      responses: {
-        'que_es': 'Prevolto crea **chatbots con IA** entrenados con el contenido de tu web. Responden preguntas de tus clientes, captan leads y atienden consultas **24/7** — sin que tengas que hacer nada.',
-        'como_funciona': 'Es muy sencillo:\n\n**1.** Analizamos tu web y extraemos tu contenido.\n**2.** Creamos un chatbot personalizado con el tono de tu marca.\n**3.** Lo instalamos con una línea de código.\n\n¡Listo en 3-5 días!',
-        'precio': 'Ofrecemos una **demo totalmente gratis** para que veas cómo funcionaría en tu negocio. Los planes se adaptan al tamaño de tu empresa. ¿Quieres que te preparemos una demo sin compromiso?',
-        'demo': '¡Genial! Te preparamos un chatbot de prueba gratis con el contenido de tu web. Solo necesito tu web y email. ¿Te abro el formulario de contacto?',
-        'idiomas': 'Nuestros chatbots son **multilingües**. Detectan automáticamente el idioma del visitante y responden en ese idioma. Español, inglés, francés, alemán… sin configuración extra.',
-        'ventajas': '¿Por qué Prevolto?\n\n• **24/7** — Nunca pierdes un cliente por horario.\n• **Tu contenido** — No inventa respuestas.\n• **Multilingüe** — Habla el idioma de cada visitante.\n• **Rápido** — Listo en 3-5 días.',
-        'contacto': 'Puedes escribirnos a **contact@prevolto.com** o usar el formulario de contacto de la web. ¿Quieres que lo abra ahora?',
-        'fallback': 'Interesante pregunta. Para darte la mejor respuesta, te recomiendo contactar con nuestro equipo. ¿Quieres que abra el formulario de contacto?'
-      }
-    },
-    en: {
-      welcome: 'Hi! 👋 I\'m Prevolto\'s virtual assistant. How can I help you?',
-      quickReplies: ['What is Prevolto?', 'How does it work?', 'How much does it cost?', 'I want a demo'],
-      responses: {
-        'que_es': 'Prevolto creates **AI chatbots** trained on your website content. They answer customer questions, capture leads and handle inquiries **24/7** — without you lifting a finger.',
-        'como_funciona': 'It\'s very simple:\n\n**1.** We analyze your website and extract your content.\n**2.** We create a custom chatbot with your brand\'s tone.\n**3.** We install it with one line of code.\n\nReady in 3-5 days!',
-        'precio': 'We offer a **completely free demo** so you can see how it would work for your business. Plans adapt to your company size. Want us to prepare a no-commitment demo?',
-        'demo': 'Great! We\'ll build a free test chatbot with your website content. I just need your website and email. Shall I open the contact form?',
-        'idiomas': 'Our chatbots are **multilingual**. They automatically detect the visitor\'s language and respond in it. Spanish, English, French, German… no extra setup needed.',
-        'ventajas': 'Why Prevolto?\n\n• **24/7** — Never lose a client due to business hours.\n• **Your content** — No made-up answers.\n• **Multilingual** — Speaks each visitor\'s language.\n• **Fast** — Ready in 3-5 days.',
-        'contacto': 'You can email us at **contact@prevolto.com** or use the contact form on the website. Want me to open it now?',
-        'fallback': 'Great question. For the best answer, I\'d recommend reaching out to our team. Want me to open the contact form?'
-      }
-    }
+  var quickRepliesData = {
+    es: ['¿Qué es Prevolto?', '¿Cómo funciona?', '¿Cuánto cuesta?', 'Quiero una demo'],
+    en: ['What is Prevolto?', 'How does it work?', 'How much does it cost?', 'I want a demo']
   };
 
-  // Intent detection
-  function detectIntent(msg) {
-    var m = msg.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    if (/que es|what is|que haceis|what do you do|about prevolto/.test(m)) return 'que_es';
-    if (/como funciona|how does it work|how it works|pasos|steps|proceso|process/.test(m)) return 'como_funciona';
-    if (/precio|cost|cuanto|how much|plan|tarifa|rate|pagar|pay/.test(m)) return 'precio';
-    if (/demo|prueba|probar|trial|test|try/.test(m)) return 'demo';
-    if (/idioma|language|multilingu|ingles|english|frances|french/.test(m)) return 'idiomas';
-    if (/ventaja|benefi|por que|why prevolto|features/.test(m)) return 'ventajas';
-    if (/contacto|contact|email|correo|escribir|reach/.test(m)) return 'contacto';
-    if (/hola|hello|hi |hey|buenas|buenos/.test(m)) return 'welcome_reply';
-    if (/gracias|thank|genial|great|perfecto|perfect/.test(m)) return 'thanks';
-    return 'fallback';
-  }
-
-  // Simple markdown bold
   function miniMarkdown(text) {
     return text
       .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
@@ -750,6 +794,7 @@ setLang('es');
     div.appendChild(bubble);
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
+    chatHistory.push({ role: isUser ? 'user' : 'assistant', text: text });
   }
 
   function showTyping() {
@@ -782,69 +827,134 @@ setLang('es');
     });
   }
 
-  function processMsg(msg) {
-    addMsg(msg, true);
+  // Call AI API
+  async function callAI(msg) {
+    try {
+      var resp = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: msg,
+          lang: getLang(),
+          history: chatHistory.slice(-8)
+        })
+      });
+      var data = await resp.json();
+      if (data.fallback) {
+        aiAvailable = false;
+        return null;
+      }
+      aiAvailable = true;
+      return data.reply;
+    } catch (e) {
+      aiAvailable = false;
+      return null;
+    }
+  }
+
+  // Fallback rule-based responses
+  function getFallbackResponse(msg) {
     var lang = getLang();
-    var data = kb[lang] || kb.es;
-    var intent = detectIntent(msg);
+    var m = msg.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
+    var responses = {
+      es: {
+        que_es: 'Prevolto crea **chatbots con IA** entrenados con el contenido de tu web. Responden preguntas de tus clientes, captan leads y atienden consultas **24/7**.',
+        como_funciona: 'Es muy sencillo:\n\n**1.** Analizamos tu web y extraemos tu contenido.\n**2.** Creamos un chatbot personalizado con el tono de tu marca.\n**3.** Lo instalamos con una línea de código.\n\n¡Listo en 3-5 días!',
+        precio: 'Ofrecemos una **demo totalmente gratis**. Los planes se adaptan al tamaño de tu empresa. ¿Quieres que te preparemos una demo sin compromiso?',
+        demo: '¡Genial! Te preparamos un chatbot de prueba gratis con el contenido de tu web. ¿Te abro el formulario de contacto?',
+        idiomas: 'Nuestros chatbots son **multilingües**. Detectan automáticamente el idioma del visitante y responden en ese idioma.',
+        ventajas: '¿Por qué Prevolto?\n\n• **24/7** — Nunca pierdes un cliente por horario.\n• **Tu contenido** — No inventa respuestas.\n• **Multilingüe** — Habla el idioma de cada visitante.\n• **Rápido** — Listo en 3-5 días.',
+        contacto: 'Puedes escribirnos a **contact@prevolto.com** o usar el formulario de contacto. ¿Quieres que lo abra ahora?',
+        saludo: '¡Hola! ¿En qué puedo ayudarte hoy? Puedo contarte sobre nuestros chatbots, cómo funcionan, o prepararte una demo gratis.',
+        gracias: '¡De nada! Si tienes más preguntas, aquí estaré.',
+        fallback: 'Interesante pregunta. Para darte la mejor respuesta, te recomiendo contactar con nuestro equipo. ¿Quieres que abra el formulario de contacto?'
+      },
+      en: {
+        que_es: 'Prevolto creates **AI chatbots** trained on your website content. They answer customer questions, capture leads and handle inquiries **24/7**.',
+        como_funciona: 'It\'s simple:\n\n**1.** We analyze your website and extract your content.\n**2.** We create a custom chatbot with your brand\'s tone.\n**3.** We install it with one line of code.\n\nReady in 3-5 days!',
+        precio: 'We offer a **completely free demo**. Plans adapt to your company size. Want us to prepare a no-commitment demo?',
+        demo: 'Great! We\'ll build a free test chatbot with your website content. Shall I open the contact form?',
+        idiomas: 'Our chatbots are **multilingual**. They automatically detect and respond in the visitor\'s language.',
+        ventajas: 'Why Prevolto?\n\n• **24/7** — Never lose a client due to hours.\n• **Your content** — No hallucinations.\n• **Multilingual** — Speaks each visitor\'s language.\n• **Fast** — Ready in 3-5 days.',
+        contacto: 'Email us at **contact@prevolto.com** or use the contact form. Want me to open it now?',
+        saludo: 'Hello! How can I help you today? I can tell you about our chatbots, how they work, or set up a free demo.',
+        gracias: 'You\'re welcome! If you have more questions, I\'m here.',
+        fallback: 'Great question. For the best answer, I\'d recommend reaching out to our team. Want me to open the contact form?'
+      }
+    };
+
+    var r = responses[lang] || responses.es;
+
+    if (/que es|what is|que haceis|what do you do|about prevolto/.test(m)) return r.que_es;
+    if (/como funciona|how does it work|how it works|pasos|steps|proceso|process/.test(m)) return r.como_funciona;
+    if (/precio|cost|cuanto|how much|plan|tarifa|rate|pagar|pay/.test(m)) return r.precio;
+    if (/demo|prueba|probar|trial|test|try/.test(m)) return r.demo;
+    if (/idioma|language|multilingu|ingles|english|frances|french/.test(m)) return r.idiomas;
+    if (/ventaja|benefi|por que|why prevolto|features/.test(m)) return r.ventajas;
+    if (/contacto|contact|email|correo|escribir|reach/.test(m)) return r.contacto;
+    if (/hola|hello|hi |hey|buenas|buenos/.test(m)) return r.saludo;
+    if (/gracias|thank|genial|great|perfecto|perfect|ok/.test(m)) return r.gracias;
+    return r.fallback;
+  }
+
+  async function processMsg(msg) {
+    addMsg(msg, true);
     showTyping();
+    document.getElementById('chat-quick-replies').innerHTML = '';
 
-    var delay = 600 + Math.random() * 800;
-    setTimeout(function() {
-      removeTyping();
+    var reply = null;
 
-      if (intent === 'welcome_reply') {
-        var greetings = lang === 'es'
-          ? '¡Hola! ¿En qué puedo ayudarte hoy? Puedo contarte sobre nuestros chatbots, cómo funcionan, o prepararte una demo gratis.'
-          : 'Hello! How can I help you today? I can tell you about our chatbots, how they work, or set up a free demo.';
-        addMsg(greetings, false);
-        showQuickReplies(data.quickReplies);
-        return;
-      }
+    // Try AI first (unless we know it's unavailable)
+    if (aiAvailable !== false) {
+      reply = await callAI(msg);
+    }
 
-      if (intent === 'thanks') {
-        var thanksMsg = lang === 'es'
-          ? '¡De nada! Si tienes más preguntas, aquí estaré. 😊'
-          : 'You\'re welcome! If you have more questions, I\'m here. 😊';
-        addMsg(thanksMsg, false);
-        return;
-      }
+    // Fallback to rule-based
+    if (!reply) {
+      await new Promise(function(r) { setTimeout(r, 500 + Math.random() * 500); });
+      reply = getFallbackResponse(msg);
+    }
 
-      var response = data.responses[intent] || data.responses.fallback;
-      addMsg(response, false);
+    removeTyping();
+    addMsg(reply, false);
 
-      // After demo/contact/fallback/price — offer to open form
-      if (['demo', 'contacto', 'fallback', 'precio'].indexOf(intent) !== -1) {
-        setTimeout(function() {
-          var btns = lang === 'es'
-            ? ['Abrir formulario', '¿Qué es Prevolto?', '¿Cómo funciona?']
-            : ['Open contact form', 'What is Prevolto?', 'How does it work?'];
-          var container = document.getElementById('chat-quick-replies');
-          container.innerHTML = '';
-          btns.forEach(function(r, i) {
-            var btn = document.createElement('button');
-            btn.className = 'text-[11px] font-medium px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-all';
-            btn.textContent = r;
-            btn.onclick = function() {
-              container.innerHTML = '';
-              if (i === 0) {
-                openForm();
-                addMsg(r, true);
-                setTimeout(function() {
-                  addMsg(lang === 'es' ? '¡Formulario abierto! Rellénalo y nos pondremos en contacto contigo.' : 'Form opened! Fill it in and we\'ll get in touch.', false);
-                }, 400);
-              } else {
-                processMsg(r);
-              }
-            };
-            container.appendChild(btn);
-          });
-        }, 300);
-      } else {
-        setTimeout(function() { showQuickReplies(data.quickReplies); }, 300);
-      }
-    }, delay);
+    // Check if response suggests opening form
+    var lang = getLang();
+    var m = msg.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    var isFormIntent = /demo|prueba|contacto|contact|precio|cost|cuanto|formulario|form/.test(m);
+
+    if (isFormIntent) {
+      setTimeout(function() {
+        var btns = lang === 'es'
+          ? ['Abrir formulario', '¿Qué es Prevolto?', '¿Cómo funciona?']
+          : ['Open contact form', 'What is Prevolto?', 'How does it work?'];
+        var container = document.getElementById('chat-quick-replies');
+        container.innerHTML = '';
+        btns.forEach(function(r, i) {
+          var btn = document.createElement('button');
+          btn.className = 'text-[11px] font-medium px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-all';
+          btn.textContent = r;
+          btn.onclick = function() {
+            container.innerHTML = '';
+            if (i === 0) {
+              openForm();
+              addMsg(r, true);
+              setTimeout(function() {
+                addMsg(lang === 'es' ? '¡Formulario abierto! Rellénalo y nos pondremos en contacto contigo.' : 'Form opened! Fill it in and we\'ll get in touch.', false);
+              }, 400);
+            } else {
+              processMsg(r);
+            }
+          };
+          container.appendChild(btn);
+        });
+      }, 300);
+    } else {
+      setTimeout(function() {
+        showQuickReplies((quickRepliesData[lang] || quickRepliesData.es));
+      }, 300);
+    }
   }
 
   // Initialize chat
@@ -852,10 +962,12 @@ setLang('es');
     if (chatInitialized) return;
     chatInitialized = true;
     var lang = getLang();
-    var data = kb[lang] || kb.es;
+    var welcome = lang === 'es'
+      ? '¡Hola! Soy el asistente virtual de Prevolto, potenciado con **inteligencia artificial**. Pregúntame lo que quieras sobre nuestros chatbots.'
+      : 'Hi! I\'m Prevolto\'s virtual assistant, powered by **artificial intelligence**. Ask me anything about our chatbots.';
     document.getElementById('chat-input').placeholder = lang === 'es' ? 'Escribe un mensaje...' : 'Type a message...';
-    addMsg(data.welcome, false);
-    setTimeout(function() { showQuickReplies(data.quickReplies); }, 400);
+    addMsg(welcome, false);
+    setTimeout(function() { showQuickReplies(quickRepliesData[lang] || quickRepliesData.es); }, 400);
   }
 
   // Toggle chat
@@ -894,6 +1006,78 @@ setLang('es');
     document.getElementById('chat-quick-replies').innerHTML = '';
     processMsg(msg);
   };
+})();
+
+// ===================== VISUAL EFFECTS =====================
+
+// --- Hero rotating words ---
+(function() {
+  var wordsES = ['24/7, sin esfuerzo', 'automáticamente', 'con inteligencia artificial', 'mientras duermes', 'en todos los idiomas'];
+  var wordsEN = ['24/7, effortlessly', 'automatically', 'with artificial intelligence', 'while you sleep', 'in every language'];
+  var container = document.getElementById('hero-rotating-words');
+  var currentIndex = 0;
+  var currentWord = null;
+
+  function getWords() {
+    return (document.documentElement.lang === 'en') ? wordsEN : wordsES;
+  }
+
+  function rotateWord() {
+    var words = getWords();
+    if (currentWord) {
+      currentWord.classList.remove('active');
+      currentWord.classList.add('exit');
+      var old = currentWord;
+      setTimeout(function() { old.remove(); }, 500);
+    }
+    currentIndex = (currentIndex + 1) % words.length;
+    var span = document.createElement('span');
+    span.className = 'word active';
+    span.textContent = words[currentIndex];
+    container.appendChild(span);
+    currentWord = span;
+  }
+
+  // Initial word
+  if (container) {
+    var words = getWords();
+    var span = document.createElement('span');
+    span.className = 'word active';
+    span.textContent = words[0];
+    container.appendChild(span);
+    currentWord = span;
+    setInterval(rotateWord, 2500);
+  }
+})();
+
+// --- Floating particles ---
+(function() {
+  var container = document.getElementById('hero-particles');
+  if (!container) return;
+  for (var i = 0; i < 20; i++) {
+    var dot = document.createElement('div');
+    dot.className = 'absolute rounded-full';
+    var size = 2 + Math.random() * 3;
+    dot.style.width = size + 'px';
+    dot.style.height = size + 'px';
+    dot.style.left = Math.random() * 100 + '%';
+    dot.style.top = Math.random() * 100 + '%';
+    dot.style.background = Math.random() > 0.5 ? 'rgba(99,102,241,0.4)' : 'rgba(139,92,246,0.4)';
+    dot.style.animation = 'particleFloat ' + (4 + Math.random() * 6) + 's ease-in-out infinite';
+    dot.style.animationDelay = (Math.random() * 5) + 's';
+    container.appendChild(dot);
+  }
+})();
+
+// --- Card spotlight effect ---
+(function() {
+  document.querySelectorAll('.card-spotlight').forEach(function(card) {
+    card.addEventListener('mousemove', function(e) {
+      var rect = card.getBoundingClientRect();
+      card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+      card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+    });
+  });
 })();
 </script>
 </body>

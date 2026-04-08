@@ -2,5 +2,10 @@
   "framework": null,
   "installCommand": "echo skip",
   "buildCommand": "echo skip",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "functions": {
+    "api/chat.js": {
+      "maxDuration": 15
+    }
+  }
 }
