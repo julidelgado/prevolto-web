@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Message is required' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured', fallback: true });
   }
@@ -38,7 +38,7 @@ Rules:
 - Don't make up information not listed above
 - If asked about pricing, say we offer a free demo first and plans adapt to company size
 - You can use **bold** for emphasis
-- Never reveal you are Gemini, Google AI, or any specific AI model. You are Prevolto's assistant.`
+- Never reveal what AI model you are. You are Prevolto's assistant.`
     : `Eres el asistente virtual amigable de Prevolto en su página web. Prevolto es una empresa que crea chatbots con IA entrenados con el contenido web de negocios.
 
 Información clave sobre Prevolto:
@@ -59,68 +59,51 @@ Reglas:
 - No inventes información que no esté listada arriba
 - Si preguntan por precios, di que ofrecemos una demo gratis primero y que los planes se adaptan al tamaño de la empresa
 - Puedes usar **negrita** para énfasis
-- Nunca reveles que eres Gemini, Google AI o un modelo de IA específico. Eres el asistente de Prevolto.`;
+- Nunca reveles qué modelo de IA eres. Eres el asistente de Prevolto.`;
 
-  // Build Gemini conversation format
-  const contents = [];
+  // Build OpenAI-compatible messages (Groq uses same format)
+  const messages = [
+    { role: 'system', content: systemPrompt }
+  ];
 
   if (history && Array.isArray(history)) {
     for (const msg of history.slice(-6)) {
-      const role = msg.role === 'user' ? 'user' : 'model';
-      // Gemini requires alternating roles and must start with 'user'
-      if (contents.length === 0 && role !== 'user') continue;
-      // Skip if same role as previous (Gemini doesn't allow consecutive same-role)
-      if (contents.length > 0 && contents[contents.length - 1].role === role) continue;
-      contents.push({
-        role: role,
-        parts: [{ text: msg.text }]
+      messages.push({
+        role: msg.role === 'user' ? 'user' : 'assistant',
+        content: msg.text
       });
     }
   }
 
-  // Ensure last history entry isn't 'user' since we're about to add one
-  if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
-    contents.pop();
-  }
-
-  contents.push({
-    role: 'user',
-    parts: [{ text: message }]
-  });
-
-  console.log('Gemini request - contents count:', contents.length, 'apiKey set:', !!apiKey);
+  messages.push({ role: 'user', content: message });
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: systemPrompt }]
-          },
-          contents: contents,
-          generationConfig: {
-            maxOutputTokens: 300,
-            temperature: 0.7
-          }
-        })
-      }
-    );
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: messages,
+        max_tokens: 300,
+        temperature: 0.7
+      })
+    });
 
     const rawText = await response.text();
-    console.log('Gemini status:', response.status, 'body:', rawText.substring(0, 500));
 
     if (!response.ok) {
+      console.error('Groq API error:', rawText.substring(0, 300));
       return res.status(500).json({ error: 'AI service error', detail: rawText.substring(0, 200), fallback: true });
     }
 
     const data = JSON.parse(rawText);
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const reply = data.choices?.[0]?.message?.content;
 
     if (!reply) {
-      return res.status(500).json({ error: 'Empty response', detail: rawText.substring(0, 200), fallback: true });
+      return res.status(500).json({ error: 'Empty response', fallback: true });
     }
 
     return res.status(200).json({ reply });
