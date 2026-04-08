@@ -109,17 +109,18 @@ Reglas:
       }
     );
 
+    const rawText = await response.text();
+    console.log('Gemini status:', response.status, 'body:', rawText.substring(0, 500));
+
     if (!response.ok) {
-      const errData = await response.text();
-      console.error('Gemini API error:', errData);
-      return res.status(500).json({ error: 'AI service error', fallback: true });
+      return res.status(500).json({ error: 'AI service error', detail: rawText.substring(0, 200), fallback: true });
     }
 
-    const data = await response.json();
+    const data = JSON.parse(rawText);
     const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!reply) {
-      return res.status(500).json({ error: 'Empty response', fallback: true });
+      return res.status(500).json({ error: 'Empty response', detail: rawText.substring(0, 200), fallback: true });
     }
 
     return res.status(200).json({ reply });
