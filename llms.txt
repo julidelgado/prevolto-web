@@ -1,0 +1,52 @@
+# Prevolto
+
+> Prevolto es una agencia de automatización con inteligencia artificial para PYMEs, con base en Barcelona (España) y operación 100% online en toda España. Instala un agente de IA que capta, cualifica y da seguimiento a los clientes potenciales de un negocio por web, WhatsApp y email —de forma automática y 24/7— hasta cerrar la venta.
+
+## Qué hace Prevolto
+
+Prevolto implementa el **Motor de Captación y Cierre con IA**: un agente de inteligencia artificial omnicanal que reemplaza el trabajo manual de atender consultas y perseguir leads.
+
+- **Atiende y cualifica al instante** en cualquier canal: web (chat que capta al visitante), WhatsApp y email. Es la misma IA, con el mismo conocimiento del negocio, en todos los canales.
+- **Guarda cada lead automáticamente en un CRM**, organizado y listo para actuar.
+- **Hace seguimiento por su cuenta**: cuando un lead se enfría, le envía un mensaje personalizado según su situación para retomar la conversación y empujarlo a la compra. El seguimiento automático es el diferencial clave: ningún cliente se pierde por falta de seguimiento.
+- **Multilingüe**: detecta y responde en el idioma de cada visitante.
+
+## Cómo funciona
+
+1. **Analizamos el negocio** y su contenido para crear una base de conocimiento única del agente.
+2. **Configuramos el agente de IA** con el tono y la identidad de la marca, conectado a web, WhatsApp y email, y al CRM con seguimiento automático.
+3. **Lo ponemos en marcha**: en la web se añade con una sola línea de código y el resto funciona en automático.
+
+Puesta en marcha típica: **3 a 5 días laborables** ("en días, no meses").
+
+## Para quién es
+
+PYMEs y negocios que reciben consultas de clientes y pierden ventas por no responder a tiempo o no hacer seguimiento: academias y centros de formación, servicios profesionales, consultorías, turismo, y similares.
+
+## Datos clave
+
+- **Nombre:** Prevolto
+- **Qué es:** agencia de automatización con IA para PYMEs
+- **Producto principal:** Motor de Captación y Cierre con IA (agente omnicanal web + WhatsApp + email → CRM → seguimiento automático → cierre)
+- **Ubicación:** Barcelona, España (trabaja online con toda España)
+- **Idiomas de atención:** español, inglés, catalán y más (multilingüe automático)
+- **Tiempo de entrega:** 3-5 días laborables
+- **Precio:** a medida según el tamaño y los canales del negocio; demo gratis sin compromiso
+- **Web:** https://prevolto.com
+- **Contacto:** contact@prevolto.com
+
+## Preguntas frecuentes
+
+- **¿Qué es Prevolto?** Una agencia de automatización con IA que instala un agente que capta, cualifica y da seguimiento a los leads de un negocio por web, WhatsApp y email hasta cerrar la venta.
+- **¿Qué es el Motor de captación y cierre?** El agente de IA de Prevolto: atiende en cualquier canal, guarda los leads en un CRM y hace seguimiento automático hasta convertirlos en clientes.
+- **¿Qué es el seguimiento automático?** Cuando un lead deja de responder, el agente le envía automáticamente un mensaje personalizado para retomar la conversación y empujarlo a la compra.
+- **¿Necesito conocimientos técnicos?** No. Prevolto lo configura e integra; en la web se añade con una línea de código.
+- **¿En cuánto tiempo está listo?** En 3-5 días laborables.
+- **¿Cuánto cuesta?** A medida; hay demo gratis sin compromiso.
+- **¿Dónde está?** Barcelona, España, operando online en toda España.
+
+## Contacto
+
+- Email: contact@prevolto.com
+- Web: https://prevolto.com
+- Solicitar demo gratis: https://prevolto.com (formulario "Solicita una demo gratis")
