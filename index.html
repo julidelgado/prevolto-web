@@ -1357,5 +1357,23 @@ setLang('es');
 <!-- ===================== VERCEL WEB ANALYTICS ===================== -->
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
 <script defer src="/_vercel/insights/script.js"></script>
+
+<!-- ===================== PREVOLTO PAGEVIEW BEACON (→ prevolto-ops) ===================== -->
+<script>
+(function(){
+  try {
+    var data = JSON.stringify({
+      path: location.pathname + location.search,
+      referrer: document.referrer || '',
+      lang: document.documentElement.lang || navigator.language || ''
+    });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/track', new Blob([data], { type: 'application/json' }));
+    } else {
+      fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: data, keepalive: true });
+    }
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>
