@@ -6,7 +6,8 @@
 
 Prevolto implementa el **Motor de Captación y Cierre con IA**: un agente de inteligencia artificial omnicanal que reemplaza el trabajo manual de atender consultas y perseguir leads.
 
-- **Atiende y cualifica al instante** en cualquier canal: web (chat que capta al visitante), WhatsApp y email. Es la misma IA, con el mismo conocimiento del negocio, en todos los canales.
+- **Atiende y cualifica al instante** en cualquier canal: WhatsApp y email (donde de verdad escriben los clientes) más un chat que añadimos a la web. Es la misma IA, con el mismo conocimiento del negocio, en todos los canales.
+- **Rescata las visitas de la web**: la mayoría de negocios reciben visitas en su web que se van sin escribir. El chat capta a ese visitante y dispara su consulta al instante por WhatsApp, convirtiendo tráfico perdido en leads.
 - **Guarda cada lead automáticamente en un CRM**, organizado y listo para actuar.
 - **Hace seguimiento por su cuenta**: cuando un lead se enfría, le envía un mensaje personalizado según su situación para retomar la conversación y empujarlo a la compra. El seguimiento automático es el diferencial clave: ningún cliente se pierde por falta de seguimiento.
 - **Multilingüe**: detecta y responde en el idioma de cada visitante.
