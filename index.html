@@ -472,37 +472,95 @@ html { scroll-behavior: smooth; }
       </div>
     </div>
 
-    <!-- Chat mockup -->
-    <div class="chat-float relative" style="opacity:0; animation: heroIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.5s forwards, float 6s ease-in-out 1.4s infinite">
-      <div class="bg-[#0d1424]/80 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6 shadow-2xl shadow-black/40">
-        <div class="flex items-center gap-3 pb-5 mb-5 border-b border-white/[0.06]">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
-            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+    <!-- Animated 3D mascot (Volt): eyes follow cursor + holds a tablet with a looping chat -->
+    <style>
+      @keyframes voltFloat { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-14px) rotate(1deg); } }
+      @keyframes voltFeed { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+      @keyframes voltBlink { 0%,92%,100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+      @keyframes voltTyping { 0%,60%,100% { opacity:.3; transform: translateY(0); } 30% { opacity:1; transform: translateY(-2px); } }
+      .volt-img { background: url('/assets/volt-hero.png') center/contain no-repeat; }
+      #volt-tilt { transition: transform .25s cubic-bezier(.22,1,.36,1); will-change: transform; }
+      .volt-face { position:absolute; left:33%; top:22.5%; width:33%; height:20%; pointer-events:none; }
+      .volt-face svg { width:100%; height:100%; overflow:visible; filter: drop-shadow(0 0 5px rgba(150,200,255,.55)); }
+      .volt-eye { fill:#EAF3FF; }
+      #volt-eyes .eye-blink { transform-box: fill-box; transform-origin:center; animation: voltBlink 5.4s ease-in-out infinite; }
+      .volt-smile { fill:none; stroke:#EAF3FF; stroke-width:4; stroke-linecap:round; }
+      .volt-screen { position:absolute; left:37%; top:56.8%; width:26%; height:17%; overflow:hidden; border-radius:6px; background:#eef3fb; box-shadow: inset 0 0 8px rgba(80,110,160,.25); }
+      .volt-feed { position:absolute; left:0; right:0; top:0; padding:5px 5px 0; display:flex; flex-direction:column; gap:4px; animation: voltFeed 13s linear infinite; }
+      .vf-row { display:flex; }
+      .vf-b { max-width:80%; font-size:6.5px; line-height:1.25; padding:2.5px 4px; border-radius:6px; font-weight:600; }
+      .vf-bot { background:#fff; color:#33405a; border:1px solid #e2e8f2; border-top-left-radius:2px; }
+      .vf-user { margin-left:auto; background:#3b6ef0; color:#fff; border-top-right-radius:2px; }
+    </style>
+    <div class="relative w-full max-w-[560px] mx-auto aspect-square select-none" style="perspective:1100px; opacity:0; animation: heroIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;">
+      <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div class="w-[66%] h-[66%] rounded-full bg-violet-600/25 blur-[100px]"></div>
+      </div>
+      <div id="volt-tilt" class="absolute inset-0">
+        <div class="w-full h-full relative" style="animation: voltFloat 6s ease-in-out infinite;">
+          <div class="volt-img absolute inset-0" role="img" aria-label="Volt, el asistente de IA de Prevolto"></div>
+          <!-- face: eyes follow cursor + blink -->
+          <div class="volt-face">
+            <svg viewBox="0 0 100 60">
+              <g id="volt-eyes">
+                <g class="eye-blink">
+                  <rect class="volt-eye" x="26" y="14" width="15" height="22" rx="7.5"/>
+                  <rect class="volt-eye" x="59" y="14" width="15" height="22" rx="7.5"/>
+                </g>
+              </g>
+              <path class="volt-smile" d="M38 44 Q50 53 62 44"/>
+            </svg>
           </div>
-          <div>
-            <p class="text-sm font-semibold text-white"><span class="es">Asistente Virtual</span><span class="en">Virtual Assistant</span></p>
-            <p class="text-[10px] text-emerald-400 flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              <span class="es">En línea</span><span class="en">Online</span>
-            </p>
-          </div>
-        </div>
-        <div class="space-y-4">
-          <div class="flex gap-2.5"><div class="bg-white/[0.06] p-3 rounded-2xl rounded-tl-sm max-w-[85%]"><p class="text-[13px] leading-relaxed text-slate-300"><span class="es">¡Hola! Soy el asistente virtual de tu empresa. ¿En qué puedo ayudarte?</span><span class="en">Hi! I'm your company's virtual assistant. How can I help you?</span></p></div></div>
-          <div class="flex justify-end"><div class="bg-blue-600/20 border border-blue-500/20 p-3 rounded-2xl rounded-tr-sm max-w-[85%]"><p class="text-[13px] leading-relaxed text-slate-200"><span class="es">¿Qué cursos de inglés ofrecéis para adultos?</span><span class="en">What English courses do you offer for adults?</span></p></div></div>
-          <div class="flex gap-2.5"><div class="bg-white/[0.06] p-3 rounded-2xl rounded-tl-sm max-w-[85%]"><p class="text-[13px] leading-relaxed text-slate-300"><span class="es">Ofrecemos cursos intensivos, clases de conversación y preparación de exámenes oficiales (Cambridge, IELTS). Los horarios son flexibles, de lunes a sábado. ¿Quieres más información?</span><span class="en">We offer intensive courses, conversation classes and official exam prep (Cambridge, IELTS). Schedules are flexible, Monday to Saturday. Want more details?</span></p></div></div>
-        </div>
-        <div class="mt-5 flex gap-2">
-          <div class="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-slate-500"><span class="es">Escribe un mensaje...</span><span class="en">Type a message...</span></div>
-          <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <!-- tablet screen: looping chat -->
+          <div class="volt-screen">
+            <div class="volt-feed">
+              <div class="vf-row"><div class="vf-b vf-bot"><span class="es">¡Hola! 👋 ¿En qué te ayudo?</span><span class="en">Hi! 👋 How can I help?</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-user"><span class="es">¿Precio del curso?</span><span class="en">Course price?</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-bot"><span class="es">Desde 49€/mes 😊</span><span class="en">From €49/mo 😊</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-user"><span class="es">¿Horarios?</span><span class="en">Schedules?</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-bot"><span class="es">Mañana y tarde, L-S</span><span class="en">AM & PM, Mon-Sat</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-user"><span class="es">¡Quiero una demo!</span><span class="en">I want a demo!</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-bot"><span class="es">¡Hola! 👋 ¿En qué te ayudo?</span><span class="en">Hi! 👋 How can I help?</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-user"><span class="es">¿Precio del curso?</span><span class="en">Course price?</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-bot"><span class="es">Desde 49€/mes 😊</span><span class="en">From €49/mo 😊</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-user"><span class="es">¿Horarios?</span><span class="en">Schedules?</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-bot"><span class="es">Mañana y tarde, L-S</span><span class="en">AM & PM, Mon-Sat</span></div></div>
+              <div class="vf-row"><div class="vf-b vf-user"><span class="es">¡Quiero una demo!</span><span class="en">I want a demo!</span></div></div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-violet-600/15 blur-[80px] rounded-full pointer-events-none"></div>
     </div>
+    <script>
+    (function(){
+      var tilt = document.getElementById('volt-tilt');
+      var eyes = document.getElementById('volt-eyes');
+      if (!tilt || window.matchMedia('(hover: none)').matches) return;
+      var pending = false, nx = 0, ny = 0;
+      function onMove(e){
+        var r = tilt.getBoundingClientRect();
+        var cx = r.left + r.width/2, cy = r.top + r.height*0.34;
+        nx = Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth * 0.5)));
+        ny = Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight * 0.5)));
+        if (!pending) { pending = true; requestAnimationFrame(apply); }
+      }
+      function apply(){
+        pending = false;
+        tilt.style.transform = 'rotateY(' + (nx*7) + 'deg) rotateX(' + (-ny*5) + 'deg) translate3d(' + (nx*8) + 'px,' + (ny*6) + 'px,0)';
+        if (eyes) eyes.setAttribute('transform', 'translate(' + (nx*7) + ' ' + (ny*5) + ')');
+      }
+      window.addEventListener('mousemove', onMove, { passive: true });
+    })();
+    </script>
   </div>
 </section>
+
+<!-- Reusable floating 3D mascot helper for sections -->
+<style>
+  @keyframes s3dFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  .s3d-wrap { animation: s3dFloat 6s ease-in-out infinite; }
+  .s3d { width:100%; height:100%; background-position:center; background-size:contain; background-repeat:no-repeat; }
+</style>
 
 <!-- ===================== HOW IT WORKS ===================== -->
 <section id="como-funciona" class="py-24 bg-white text-slate-900">
@@ -556,7 +614,9 @@ html { scroll-behavior: smooth; }
       <p class="text-slate-500 text-lg max-w-xl mx-auto mt-4"><span class="es">No es solo un chat. Es un motor que capta, atiende y cierra clientes por ti.</span><span class="en">It's not just a chat. It's an engine that captures, serves and closes clients for you.</span></p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-16 items-center">
+      <div class="reveal s3d-wrap hidden lg:block w-full max-w-[380px] mx-auto aspect-square"><div class="s3d" style="background-image:url('/assets/volt-present.png')"></div></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div class="reveal card-spotlight p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300" style="transition-delay:0s">
         <div class="relative z-10">
           <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
@@ -593,6 +653,7 @@ html { scroll-behavior: smooth; }
           <p class="text-slate-500 text-sm leading-relaxed"><span class="es">Guarda y organiza a cada cliente potencial, listo para vender. Y habla el idioma de cada visitante.</span><span class="en">Saves and organizes every potential customer, ready to sell. And speaks each visitor's language.</span></p>
         </div>
       </div>
+      </div>
     </div>
   </div>
 </section>
@@ -606,7 +667,8 @@ html { scroll-behavior: smooth; }
       <p class="text-xs font-bold tracking-[0.2em] uppercase text-blue-400 mb-4"><span class="es">Éxito comprobado</span><span class="en">Proven success</span></p>
       <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white"><span class="es">Caso real</span><span class="en">Case study</span></h2>
     </div>
-    <div class="reveal max-w-3xl mx-auto">
+    <div class="reveal grid lg:grid-cols-[0.82fr_1fr] gap-8 lg:gap-12 items-center max-w-5xl mx-auto">
+      <div class="s3d-wrap hidden lg:block w-full max-w-[360px] mx-auto aspect-square"><div class="s3d" style="background-image:url('/assets/volt-case.png')"></div></div>
       <div class="bg-[#0d1424]/60 backdrop-blur-xl border border-white/[0.08] border-glow rounded-2xl p-8 sm:p-10 space-y-6">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
           <span class="text-[11px] font-semibold text-blue-400 tracking-wider uppercase"><span class="es">Sector energético</span><span class="en">Energy sector</span></span>
@@ -775,10 +837,16 @@ html { scroll-behavior: smooth; }
 
 <!-- ===================== FOOTER ===================== -->
 <footer class="border-t border-white/[0.06] py-10">
-  <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
-    <span class="flex items-center gap-2"><img src="/assets/logo.png" alt="Prevolto" class="h-6 w-auto"><span class="text-sm font-bold tracking-tight text-white">Prevolto</span></span>
-    <span class="text-sm text-slate-400">contact@prevolto.com</span>
-    <p class="text-xs text-slate-600">&copy; 2026 Prevolto</p>
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+      <span class="flex items-center gap-2"><img src="/assets/logo.png" alt="Prevolto" class="h-6 w-auto"><span class="text-sm font-bold tracking-tight text-white">Prevolto</span></span>
+      <a href="mailto:contact@prevolto.com" class="text-sm text-slate-400 hover:text-white transition-colors">contact@prevolto.com</a>
+      <a href="https://www.instagram.com/prevolto" target="_blank" rel="noopener" aria-label="Instagram de Prevolto" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        <span class="text-sm font-medium">@prevolto</span>
+      </a>
+    </div>
+    <p class="text-center text-xs text-slate-600 mt-8">&copy; 2026 Prevolto</p>
   </div>
 </footer>
 
@@ -975,6 +1043,50 @@ setLang('es');
   animation: chatSlideUp 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 </style>
+
+<!-- Hint bubble (viñeta) pointing at the live widget -->
+<style>
+  @keyframes hintPop { from { opacity:0; transform:translateY(12px) scale(.94); } to { opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes hintBob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
+  #widget-hint { animation: hintPop .55s cubic-bezier(.16,1,.3,1) forwards; }
+  #widget-hint .hint-inner { animation: hintBob 4.5s ease-in-out .6s infinite; }
+</style>
+<div id="widget-hint" class="hidden fixed right-6 z-[54]" style="bottom:94px; max-width:265px; opacity:0;">
+  <div class="hint-inner relative bg-white rounded-2xl rounded-br-md shadow-2xl shadow-black/40 px-4 py-3 pr-8 cursor-pointer" onclick="openChatFromHint()">
+    <button onclick="event.stopPropagation(); dismissHint()" aria-label="Cerrar" class="absolute top-1.5 right-2 text-slate-300 hover:text-slate-600 transition-colors">
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <p class="text-[13px] leading-snug font-medium text-slate-800">
+      <span class="es">👋 Este es un ejemplo del asistente que instalaríamos en tu web. ¡Pruébalo!</span>
+      <span class="en">👋 This is an example of the assistant we'd install on your site. Try it!</span>
+    </p>
+    <div class="absolute -bottom-1.5 right-7 w-3.5 h-3.5 bg-white rotate-45 rounded-[2px]"></div>
+  </div>
+</div>
+<script>
+  function dismissHint() {
+    var h = document.getElementById('widget-hint');
+    if (h) { h.style.display = 'none'; }
+    try { localStorage.setItem('pv_hint_dismissed', '1'); } catch (e) {}
+  }
+  function openChatFromHint() {
+    dismissHint();
+    var panel = document.getElementById('chat-panel');
+    if (panel && panel.classList.contains('hidden') && typeof toggleChat === 'function') { toggleChat(); }
+  }
+  window.addEventListener('load', function () {
+    var btn = document.getElementById('chat-widget-btn');
+    if (btn) { btn.addEventListener('click', dismissHint); }
+    var dismissed = false;
+    try { dismissed = localStorage.getItem('pv_hint_dismissed') === '1'; } catch (e) {}
+    if (!dismissed) {
+      setTimeout(function () {
+        var h = document.getElementById('widget-hint');
+        if (h) { h.classList.remove('hidden'); }
+      }, 2800);
+    }
+  });
+</script>
 
 <!-- Floating chat button -->
 <button id="chat-widget-btn" onclick="toggleChat()" class="fixed bottom-6 right-6 z-[55] w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white shadow-xl shadow-indigo-600/30 flex items-center justify-center transition-all duration-300 cursor-pointer">
